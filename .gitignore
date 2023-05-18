@@ -5,3 +5,5 @@ kernel.asm
 .gdbinit
 .vscode
 *.s
+/.gdbinit
+test
