@@ -1,0 +1,7 @@
+build
+.idea
+kernel.asm
+/kernel
+.gdbinit
+.vscode
+*.s
