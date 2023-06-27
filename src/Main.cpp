@@ -8,6 +8,4 @@ void  main()
     __putc('\n');
     __putc('\n');
 
-
-
 }
