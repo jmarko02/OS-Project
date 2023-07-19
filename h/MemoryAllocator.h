@@ -9,16 +9,27 @@
 
 class MemoryAllocator {
 private:
-    struct Node{
-        size_t size;
-        Node* next;
+    struct FreeNode{
+        size_t size; //size in blocks
+        FreeNode* next;
+        FreeNode* prev;
     };
 
-public:
-    Node* free_head;
-    Node* used_head;
-    //PRAVI SIGNLETON!!!
+    //static MemoryAllocator instance ;
 
+
+    MemoryAllocator();
+    FreeNode* freeHead;
+
+public:
+    static MemoryAllocator& getInstance();
+
+    size_t BytesToBlocks(size_t bytes);
+    void join(FreeNode* ptr);
+
+    void* alloc(size_t sizeInBytes);
+    void free(void* pointer);
 };
+//MemoryAllocator* MemoryAllocator::instance = nullptr;
 
 #endif //OS_PROJECT_MEMORYALLOCATOR_H

@@ -1,11 +1,7 @@
 #include "../lib/console.h"
-
-void  main()
-{
-    __putc('O');
-    __putc('S');
-    __putc('1');
-    __putc('\n');
-    __putc('\n');
-
+#include "../h/MemoryAllocator.h"
+void  main() {
+    MemoryAllocator mem = MemoryAllocator::getInstance();
+    void *first = mem.alloc(200);
+    mem.free(first);
 }
