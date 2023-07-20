@@ -38,8 +38,10 @@ void *MemoryAllocator::alloc(size_t sizeInBytes) {
                 freeHead = newFragment;
                 newFragment->size = savedSize;
             }
-            else cur->prev->next
-            = newFragment; 
+            else {
+                cur->prev->next = newFragment;
+                newFragment->size = cur->size - blockCount;
+            }
             if(cur->next) cur->next->prev = newFragment;
             //newFragment->size = cur->size;
             newFragment->next = cur->next;
@@ -81,6 +83,7 @@ void MemoryAllocator::join(MemoryAllocator::FreeNode *ptr) {
     if( ptr->next && (char*)ptr + ptr->size*MEM_BLOCK_SIZE == (char*)(ptr->next)){
         ptr->size += ptr->next->size;
         ptr->next = ptr->next->next;
+
         if(ptr->next) ptr->next->prev = ptr;
     }
 }
