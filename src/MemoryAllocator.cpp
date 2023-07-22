@@ -32,24 +32,45 @@ void *MemoryAllocator::alloc(size_t sizeInBytes) {
             //*cur = blockCount;
 
             //dodaj : ako ostaje samo 1 blok, npr ako imam mesta za 10 blokova a alociram 9, onda alociraj svih 10 jer mi jedan ne znaci nista,2 vec znace
-            FreeNode* newFragment = (FreeNode*)((char*)cur+ blockCount*MEM_BLOCK_SIZE);
-            if(!cur->prev){
-                size_t savedSize = freeHead->size - blockCount;
-                freeHead = newFragment;
-                newFragment->size = savedSize;
+            if(cur->size - blockCount <= 1){
+                *(size_t*)cur = blockCount;
+                //pogledaj analogno dole if(!cur->prev) i tako odradi i za ovaj slucaj
+                /*if(freeHead == cur ){
+                    if(cur->next) freeHead = cur->next;
+                    else freeHead = nullptr;
+                } else if (cur->prev){
+                    cur->prev->next = cur->next;
+                }
+                //
+                cur->next = nullptr;
+                cur->prev = nullptr;
+                 */
+                if(cur->prev) cur->prev->next = cur->next;
+                else freeHead = cur->next;
+                if(cur->next) cur->next->prev = cur->prev;
+                void* returnPointer = (char*)cur + 1*MEM_BLOCK_SIZE;
+                return returnPointer;
+            } else {
+                FreeNode* newFragment = (FreeNode*)((char*)cur+ blockCount*MEM_BLOCK_SIZE);
+                if(!cur->prev){
+                    size_t savedSize = freeHead->size - blockCount;
+                    freeHead = newFragment;
+                    newFragment->size = savedSize;
+                }
+                else {
+                    cur->prev->next = newFragment;
+                    newFragment->size = cur->size - blockCount;
+                }
+                if(cur->next) cur->next->prev = newFragment;
+                //newFragment->size = cur->size;
+                newFragment->next = cur->next;
+                newFragment->prev = cur->prev;
+                *(size_t*)cur = blockCount;
+                void* returnPointer = (char*)cur + 1*MEM_BLOCK_SIZE;
+                return returnPointer;
+
             }
-            else {
-                cur->prev->next = newFragment;
-                newFragment->size = cur->size - blockCount;
-            }
-            if(cur->next) cur->next->prev = newFragment;
-            //newFragment->size = cur->size;
-            newFragment->next = cur->next;
-            newFragment->prev = cur->prev;
-            *(size_t*)cur = blockCount;
-            void* returnPointer = (char*)cur + 1*MEM_BLOCK_SIZE;
-            return returnPointer;
-            //return  pointer = (???char*???)cur + memblocksize
+
 
         }
     }
