@@ -28,23 +28,9 @@ void *MemoryAllocator::alloc(size_t sizeInBytes) {
 
     for(FreeNode* cur = freeHead; cur != nullptr; cur = cur->next){
         if(cur->size >= blockCount) { //first fit
-            //*(size_t*)cur = blockCount;
-            //*cur = blockCount;
 
-            //dodaj : ako ostaje samo 1 blok, npr ako imam mesta za 10 blokova a alociram 9, onda alociraj svih 10 jer mi jedan ne znaci nista,2 vec znace
-            if(cur->size - blockCount <= 1){
+             if(cur->size - blockCount <= 1){
                 *(size_t*)cur = blockCount;
-                //pogledaj analogno dole if(!cur->prev) i tako odradi i za ovaj slucaj
-                /*if(freeHead == cur ){
-                    if(cur->next) freeHead = cur->next;
-                    else freeHead = nullptr;
-                } else if (cur->prev){
-                    cur->prev->next = cur->next;
-                }
-                //
-                cur->next = nullptr;
-                cur->prev = nullptr;
-                 */
                 if(cur->prev) cur->prev->next = cur->next;
                 else freeHead = cur->next;
                 if(cur->next) cur->next->prev = cur->prev;
@@ -62,9 +48,10 @@ void *MemoryAllocator::alloc(size_t sizeInBytes) {
                     newFragment->size = cur->size - blockCount;
                 }
                 if(cur->next) cur->next->prev = newFragment;
-                //newFragment->size = cur->size;
+
                 newFragment->next = cur->next;
                 newFragment->prev = cur->prev;
+                 //newFragment->size = cur->size - blockCount;
                 *(size_t*)cur = blockCount;
                 void* returnPointer = (char*)cur + 1*MEM_BLOCK_SIZE;
                 return returnPointer;
