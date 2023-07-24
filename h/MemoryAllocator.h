@@ -27,8 +27,8 @@ public:
     size_t BytesToBlocks(size_t bytes);
     void join(FreeNode* ptr);
 
-    void* alloc(size_t sizeInBytes);
-    void free(void* pointer);
+    void* alloc(size_t sizeInBlocks);
+    int free(void* pointer);
 };
 //MemoryAllocator* MemoryAllocator::instance = nullptr;
 

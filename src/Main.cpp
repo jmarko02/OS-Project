@@ -9,19 +9,19 @@ void  main() {
     void *four = mem.alloc(150);
     void *five = mem.alloc(60);
 
-    mem.free(two);
+    int x = mem.free(two);
     void* six = mem.alloc(500);
-    mem.free(four);
-    mem.free(three);
+    x =mem.free(four);
+    x =mem.free(three);
     void* seven = mem.alloc(200);
     void* eight = mem.alloc(10000);
     void* nine = mem.alloc(1000);
-    mem.free(one);
-    mem.free(five);
-    mem.free(six);
-    mem.free(seven);
-    mem.free(eight);
-    mem.free(nine);
+    x =mem.free(one);
+    x =mem.free(five);
+    x =mem.free(six);
+    x =mem.free(seven);
+    x =mem.free(eight);
+    x =mem.free(nine);
 
    /*
     void *one = mem.alloc(200);

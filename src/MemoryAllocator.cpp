@@ -18,13 +18,13 @@ MemoryAllocator& MemoryAllocator::getInstance() {
     static MemoryAllocator instance;
     return instance;
 }
-
+//ova fja nije potrebna?
 size_t MemoryAllocator::BytesToBlocks(size_t bytes) {
     return (bytes + MEM_BLOCK_SIZE - 1)/MEM_BLOCK_SIZE  + 1;
 }
 
-void *MemoryAllocator::alloc(size_t sizeInBytes) {
-    size_t blockCount = BytesToBlocks(sizeInBytes);
+void *MemoryAllocator::alloc(size_t blockCount) {
+    //size_t blockCount = BytesToBlocks(sizeInBytes);
 
     for(FreeNode* cur = freeHead; cur != nullptr; cur = cur->next){
         if(cur->size >= blockCount) { //first fit
@@ -57,16 +57,20 @@ void *MemoryAllocator::alloc(size_t sizeInBytes) {
                 return returnPointer;
 
             }
-
-
         }
     }
     return nullptr;
 }
 
-void MemoryAllocator::free(void* pointer) {
+int MemoryAllocator::free(void* pointer) {
+
+    if (pointer == nullptr || (uint64 *)pointer>(uint64*)HEAP_END_ADDR || (uint64 *)pointer>(uint64*)HEAP_END_ADDR) return -1;
 
     size_t blockCount = *( (size_t*) ( (char*)pointer -1*MEM_BLOCK_SIZE) );
+
+    auto addr = (char*)pointer - MEM_BLOCK_SIZE;
+    if((char*)addr + blockCount*MEM_BLOCK_SIZE >= HEAP_END_ADDR) return -2;
+
     FreeNode* cur = nullptr;
     if(!freeHead || pointer < freeHead) cur = nullptr;
     else {
@@ -83,7 +87,7 @@ void MemoryAllocator::free(void* pointer) {
 
     join(newSeg);
     join(cur);
-
+    return 0;
 }
 
 void MemoryAllocator::join(MemoryAllocator::FreeNode *ptr) {
