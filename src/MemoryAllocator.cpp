@@ -64,7 +64,7 @@ void *MemoryAllocator::alloc(size_t blockCount) {
 
 int MemoryAllocator::free(void* pointer) {
 
-    if (pointer == nullptr || (uint64 *)pointer>(uint64*)HEAP_END_ADDR || (uint64 *)pointer>(uint64*)HEAP_END_ADDR) return -1;
+    if (pointer == nullptr || (uint64 *)pointer<(uint64*)HEAP_START_ADDR || (uint64 *)pointer>=(uint64*)HEAP_END_ADDR) return -1;
 
     size_t blockCount = *( (size_t*) ( (char*)pointer -1*MEM_BLOCK_SIZE) );
 
