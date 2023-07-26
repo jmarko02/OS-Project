@@ -1,6 +1,9 @@
 #include "../lib/console.h"
 #include "../h/MemoryAllocator.h"
+#include "../h/riscv.hpp"
+
 void  main() {
+    /*
     MemoryAllocator mem = MemoryAllocator::getInstance();
 
    void *one = mem.alloc(200);
@@ -22,7 +25,7 @@ void  main() {
     x =mem.free(seven);
     x =mem.free(eight);
     x =mem.free(nine);
-
+    */
    /*
     void *one = mem.alloc(200);
     void *two = mem.alloc(100);
@@ -38,4 +41,6 @@ void  main() {
     mem.free(six);
     mem.free(three);
     */
+
+   asm volatile ("csrw stvec, %[vector]" : : [vector] "r"(&supervisorTrap));
 }
