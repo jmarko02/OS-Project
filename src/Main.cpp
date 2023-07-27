@@ -2,6 +2,12 @@
 #include "../h/MemoryAllocator.h"
 #include "../h/riscv.hpp"
 
+//extern "C" void supervisorTrap();
+
+//extern "C" void handleExcEcallTrap(){}
+//extern "C" void handleHardwareTrap(){}
+//extern "C" void handleTimerTrap(){}
+
 void  main() {
     /*
     MemoryAllocator mem = MemoryAllocator::getInstance();
@@ -42,5 +48,9 @@ void  main() {
     mem.free(three);
     */
 
-   asm volatile ("csrw stvec, %[vector]" : : [vector] "r"(&supervisorTrap));
+   __asm__ volatile ("csrw stvec, %[vector]" : : [vector] "r"((uint64)&supervisorTrap+1));
+   uint64 mask = 0x02;
+   __asm__ volatile("csrs sstatus, %0" : : "r"(mask));
+   while(1){}
+
 }
