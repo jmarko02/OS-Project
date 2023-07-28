@@ -48,7 +48,7 @@ void  main() {
     mem.free(three);
     */
 
-   __asm__ volatile ("csrw stvec, %[vector]" : : [vector] "r"((uint64)&supervisorTrap+1));
+   __asm__ volatile ("csrw stvec, %[vector]" : : [vector] "r"((uint64)&Riscv::supervisorTrap+1));
    uint64 mask = 0x02;
    __asm__ volatile("csrs sstatus, %0" : : "r"(mask));
    while(1){}
