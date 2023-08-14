@@ -4,11 +4,11 @@
 
 #ifndef OS_PROJECT_SCHEDULER_HPP
 #define OS_PROJECT_SCHEDULER_HPP
-class CCB;
+class TCB;
 struct Node{
-    CCB *data;
+    TCB *data;
     Node *next;
-    Node(CCB* data, Node* next) :data(data),next(next){}
+    Node(TCB* data, Node* next) : data(data), next(next){}
 };
 
 class Scheduler{
@@ -18,7 +18,7 @@ private:
     static Node *tail;
 public:
 
-    static CCB* get();
-    static void put(CCB* ccb);
+    static TCB* get();
+    static void put(TCB* ccb);
 };
 #endif //OS_PROJECT_SCHEDULER_HPP

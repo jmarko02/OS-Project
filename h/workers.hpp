@@ -7,5 +7,7 @@
 
 extern void workerBodyA();
 extern void workerBodyB();
+extern void workerBodyC();
+extern void workerBodyD();
 
 #endif //OS_PROJECT_WORKERS_HPP

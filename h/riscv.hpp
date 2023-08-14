@@ -20,6 +20,7 @@ public :
 
     static void popRegisters();
 
+    //pop sstatus.spp and sstatus.spie bits
     static void popSppSpie();
 
     static uint64 r_scause();

@@ -8,7 +8,7 @@
 //extern "C" void handleHardwareTrap(){}
 //extern "C" void handleTimerTrap(){}
 
-#include "../h/ccb.hpp"
+#include "../h/tcb.hpp"
 #include "../h/workers.hpp"
 #include "../h/print.hpp"
 int  main() {
@@ -56,27 +56,42 @@ int  main() {
    uint64 mask = 0x02;
    __asm__ volatile("csrs sstatus, %0" : : "r"(mask));
    while(1){}
-    */
+  */
 
-   CCB* coroutines[3];
+    TCB* threads[5];
 
-   coroutines[0] = CCB::createCoroutine(nullptr);
-   CCB::running = coroutines[0];
-
-   coroutines[1] = CCB::createCoroutine(workerBodyA);
-   printString("CoroutineA created\n");
+    threads[0] = TCB::createThread(nullptr);
+    TCB::running = threads[0];
 
 
-    coroutines[2] = CCB::createCoroutine(workerBodyB);
-    printString("CoroutineB created\n");
+   Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
+   Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
+
+
+    threads[1] = TCB::createThread(workerBodyA);
+    printString("ThreadA created\n");
+
+    threads[2] = TCB::createThread(workerBodyB);
+    printString("ThreadB created\n");
+
+    threads[3] = TCB::createThread(workerBodyC);
+   printString("ThreadC created\n");
+
+
+    threads[4] = TCB::createThread(workerBodyD);
+    printString("ThreadD created\n");
 
      //main metoda prepusta procesor napravljenim korutinama
 
-     while(! (coroutines[1]->isFinished() && coroutines[2]->isFinished())) {
-         CCB::yield();
+     while(! (threads[1]->isFinished() &&
+                threads[2]->isFinished() &&
+                threads[3]->isFinished() &&
+                threads[4]->isFinished()))
+     {
+         TCB::yield();
      }
 
-    for(auto &coroutine : coroutines){
+    for(auto &coroutine : threads){
         delete coroutine;
     }
 

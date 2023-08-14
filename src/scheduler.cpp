@@ -7,25 +7,25 @@
 Node* Scheduler::head = nullptr;
 Node* Scheduler::tail = nullptr;
 
-CCB *Scheduler::get() {
+TCB *Scheduler::get() {
     if( !head ){return 0;}
 
     Node *node = head;
     head = head->next;
     if(!head) {tail = 0;}
 
-    CCB* ret = node->data;
+    TCB* ret = node->data;
     //MemoryAllocator::getInstance().free(node);
     delete node; //umesto ove linije iznad
     return ret;
 
 }
 
-void Scheduler::put(CCB *ccb) {
+void Scheduler::put(TCB *tcb) {
     //Node *node = (Node*)MemoryAllocator::getInstance().alloc((sizeof(Node)+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
-    Node* node = new Node(ccb,0); // ova linija umesto ove iznad
+    Node* node = new Node(tcb,0); // ova linija umesto ove iznad
     //sledece dve linije umesto ktora u structuri
-    node->data = ccb;
+    node->data = tcb;
     node->next = 0;
     if(tail != nullptr){
         tail->next = node;
