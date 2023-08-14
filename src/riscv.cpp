@@ -4,7 +4,7 @@
 
 #include "../h/riscv.hpp"
 #include "../lib/hw.h"
-#include "../h/MemoryAllocator.h"
+#include "../h/MemoryAllocator.hpp"
 #include "../lib/console.h"
 
 void Riscv::popSppSpie() {

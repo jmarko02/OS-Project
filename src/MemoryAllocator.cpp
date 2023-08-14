@@ -2,7 +2,7 @@
 // Created by os on 7/7/23.
 //
 
-#include "../h/MemoryAllocator.h"
+#include "../h/MemoryAllocator.hpp"
 
 MemoryAllocator::MemoryAllocator() {
     uint64 heapSize = (uint64)HEAP_END_ADDR - (uint64)HEAP_START_ADDR; //in bytes

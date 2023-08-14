@@ -2,8 +2,8 @@
 // Created by os on 6/27/23.
 //
 
-#ifndef OS_PROJECT_MEMORYALLOCATOR_H
-#define OS_PROJECT_MEMORYALLOCATOR_H
+#ifndef OS_PROJECT_MEMORYALLOCATOR_HPP
+#define OS_PROJECT_MEMORYALLOCATOR_HPP
 
 #include "../lib/hw.h"
 
@@ -32,4 +32,4 @@ public:
 };
 //MemoryAllocator* MemoryAllocator::instance = nullptr;
 
-#endif //OS_PROJECT_MEMORYALLOCATOR_H
+#endif //OS_PROJECT_MEMORYALLOCATOR_HPP

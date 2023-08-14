@@ -1,5 +1,5 @@
 #include "../lib/console.h"
-#include "../h/MemoryAllocator.h"
+#include "../h/MemoryAllocator.hpp"
 #include "../h/riscv.hpp"
 
 //extern "C" void supervisorTrap();
@@ -8,7 +8,10 @@
 //extern "C" void handleHardwareTrap(){}
 //extern "C" void handleTimerTrap(){}
 
-void  main() {
+#include "../h/ccb.hpp"
+#include "../h/workers.hpp"
+#include "../h/print.hpp"
+int  main() {
     /*
     MemoryAllocator mem = MemoryAllocator::getInstance();
 
@@ -48,9 +51,35 @@ void  main() {
     mem.free(three);
     */
 
+   /*
    __asm__ volatile ("csrw stvec, %[vector]" : : [vector] "r"((uint64)&Riscv::supervisorTrap+1));
    uint64 mask = 0x02;
    __asm__ volatile("csrs sstatus, %0" : : "r"(mask));
    while(1){}
+    */
 
+   CCB* coroutines[3];
+
+   coroutines[0] = CCB::createCoroutine(nullptr);
+   CCB::running = coroutines[0];
+
+   coroutines[1] = CCB::createCoroutine(workerBodyA);
+   printString("CoroutineA created\n");
+
+
+    coroutines[2] = CCB::createCoroutine(workerBodyB);
+    printString("CoroutineB created\n");
+
+     //main metoda prepusta procesor napravljenim korutinama
+
+     while(! (coroutines[1]->isFinished() && coroutines[2]->isFinished())) {
+         CCB::yield();
+     }
+
+    for(auto &coroutine : coroutines){
+        delete coroutine;
+    }
+
+    printString("FInished\n");
+    return 0;
 }

@@ -16,6 +16,10 @@
 class Riscv{
 public :
 
+    static void pushRegisters();
+
+    static void popRegisters();
+
     static void popSppSpie();
 
     static uint64 r_scause();
@@ -33,7 +37,7 @@ public :
     enum BitMaskSip{
         SIP_SSIP = (1<<1),
         SIP_STIP = (1<<5),
-        SIP_SEIP = (1<<8),
+        SIP_SEIP = (1<<9),
     };
 
     static void ms_sip(uint64 mask);
@@ -44,7 +48,7 @@ public :
     enum BitMaskSstatus{
         SSTATUS_SIE = (1<<1),
         SSTATUS_SPIE = (1<<5),
-        SSTATUS_SPP = (1<<9),
+        SSTATUS_SPP = (1<<8),
     };
 
     static void ms_sstatus(uint64 mask);
