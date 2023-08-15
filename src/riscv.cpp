@@ -8,6 +8,7 @@
 #include "../lib/console.h"
 #include "../h/tcb.hpp"
 #include "../h/print.hpp"
+//#include "../h/syscall_c.h"
 
 void Riscv::popSppSpie() { //mora biti non inlline, mora zaista da se pozove ova fja
     __asm__ volatile ("csrw sepc, ra");
@@ -17,9 +18,9 @@ void Riscv::popSppSpie() { //mora biti non inlline, mora zaista da se pozove ova
 void Riscv::handleExcEcallTrap() {
 
     uint64 volatile a1 = r_a1();
-    /*uint64 volatile a2 = r_a2();
+    uint64 volatile a2 = r_a2();
     uint64 volatile a3 = r_a3();
-    uint64 volatile a4 = r_a4();*/
+    uint64 volatile a4 = r_a4();
     long volatile a0 = r_a0();
 
     uint64 volatile scauseVar;
@@ -29,8 +30,10 @@ void Riscv::handleExcEcallTrap() {
     if(scauseVar == 0x0000000000000008UL || scauseVar == 0x0000000000000009UL){ //S-mode(9), U-mode(8)
 
        uint64 volatile sepc = r_sepc() + 4;
-       w_sepc(sepc);
-        printInteger(a0);
+       uint64 volatile sstatus = r_sstatus();//psw
+
+        //printInteger(a0);
+        //printString("\n");
        //uint64 volatile sstatus = r_sstatus();//psw
 
         /* //ZA ASINHRONU
@@ -51,13 +54,31 @@ void Riscv::handleExcEcallTrap() {
         else if(a0 == 0x02){
             //printInteger(a0);
             a0 = MemoryAllocator::getInstance().free((void*)a1);
+
             w_a0_stack(a0);
-        }else {
+
+        }else if(a0 == 0x11){
+
+            TCB** handle = (TCB**)a1;
+            uint64* stack = (uint64*)a2;
+            TCB::Body start_routine = (TCB::Body)a3;
+            void* arg = (void*)a4;
+
+            *handle = TCB::threadCreate(stack,start_routine,arg);
+            uint64 ret = 0;
+            if(handle == nullptr) ret = -1;
+            __asm__ volatile ("mv a0, %[rVal]" : : [rVal]"r"(ret));
+
+        } else {
 
         }
+        w_sstatus(sstatus);
+        w_sepc(sepc);
 
     } else { //unexpected trap cause
         //print scause, sepc and stval
+        printString("ERR: ");
+        printInteger(scauseVar);
     }
 
 

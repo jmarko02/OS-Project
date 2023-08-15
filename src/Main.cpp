@@ -131,7 +131,16 @@ int  main() {
 
     Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
 
+    /*
     void* first = mem_alloc(100);
     mem_free(first);
+    */
+
+     //ZA TREAD_CREATE
+    TCB* handle ;
+    uint64 ret = thread_create(&handle,nullptr,nullptr);
+    printInteger(ret);
+
+
     return 0;
 }

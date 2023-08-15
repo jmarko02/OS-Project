@@ -13,8 +13,10 @@ public:
 
     ~TCB() { delete[] stack;}
 
-    using Body = void (*)();
+    using Body = void (*)(void*);
     static TCB *createThread(Body body);
+
+    static TCB *threadCreate(uint64* stack, Body body, void* arg);
 
     bool isFinished() const { return finished;}
     void setFinished (bool finished){ TCB::finished = finished;}
@@ -25,6 +27,8 @@ public:
 
     static TCB* running;
 
+    void* operator new (size_t);
+    void operator delete (void* ptr) noexcept;
 private:
     /*explicit TCB(Body body, uint64 timeSlice) : //ZA ASINHRONU
         body(body),
@@ -38,7 +42,7 @@ private:
     {
         if(body != nullptr) Scheduler::put(this);
     }*/
-    explicit TCB(Body body) : //ZA ASINHRONU
+    /*explicit TCB(Body body) : //ZA ASINHRONU
             body(body),
             stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
 
@@ -49,17 +53,31 @@ private:
             finished(false)
     {
         if(body != nullptr) Scheduler::put(this);
-    }
+    }*/
+    TCB(uint64* stack, Body body, void* arg ):
+            stack(stack),
+            body(body),
+            arg(arg),
+            context({
+                (uint64)&threadWrapper,
+                stack != nullptr ? (uint64)&this->stack[STACK_SIZE]: 0
+            }),
+            finished(false)
+    {
+        if(body != nullptr) Scheduler::put(this);
 
+    }
+    uint64 *stack; //bice char* a ne uint64*
+    Body body;//za svaku coroutine pamtimo koje telo ona izvrsava
+    void* arg;
     struct Context {
         uint64 ra;
         uint64 sp;
     }; //ostale registre cuvamo na steku
-    Body body;//za svaku coroutine pamtimo koje telo ona izvrsava
-    uint64 *stack; //bice char* a ne uint64*
     Context context;
     //uint64 timeSlice; //ZA ASINHRONU
     bool finished;
+
 
     friend class Riscv;
 
