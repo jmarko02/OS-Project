@@ -6,17 +6,17 @@
 
 TCB* TCB::running = nullptr;
 
-uint64 TCB::timeSliceCounter = 0;
+//uint64 TCB::timeSliceCounter = 0;
 
 TCB *TCB::createThread(Body body){
-    return new TCB(body,TIME_SLICE);
+    return new TCB(body);
 }
 
 void TCB::yield() {
-    //Riscv::pushRegisters();
-    //TCB::dispatch();
-    //Riscv::popRegisters();
-    __asm__ volatile ("ecall");
+    Riscv::pushRegisters();
+    TCB::dispatch();
+    Riscv::popRegisters();
+   // __asm__ volatile ("ecall");
 }
 
 void TCB::dispatch() {
@@ -29,8 +29,8 @@ void TCB::dispatch() {
 }
 
 void TCB::threadWrapper() {
-    Riscv::popSppSpie();
+    //Riscv::popSppSpie();
     running->body();
-    running->setFinished(true);
-    TCB::yield();//posto je ta nit finished , idemo na yield da pocne neka druga da se izvrsava
+    //running->setFinished(true);
+    //TCB::yield();//posto je ta nit finished , idemo na yield da pocne neka druga da se izvrsava
 }

@@ -25,13 +25,16 @@ void Riscv::handleExcEcallTrap() {
     __asm__ volatile ("csrr %[scause], scause" :[scause] "=r"(scauseVar));
 
     if(scauseVar == 0x0000000000000008UL || scauseVar == 0x0000000000000009UL){ //S-mode(9), U-mode(8)
-
+       // uint64 sepc = r_sepc() + 4;
+        //uint64 sstatus = r_sstatus();//psw
+        /* //ZA ASINHRONU
         uint64 sepc = r_sepc() + 4; //
         uint64 sstatus = r_sstatus();//psw
         TCB::timeSliceCounter = 0;
         TCB::dispatch();
         w_sstatus(sstatus);
         w_sepc(sepc);
+         */
         //zasto je ovo iznad uglavnom izostavljeno iz projekata koje ljudi stave na si wiki?
         if(a0 == 0x01){
             void* pointer = MemoryAllocator::getInstance().alloc(a1);
@@ -64,6 +67,7 @@ void Riscv::handleTimerTrap() {
     __asm__ volatile ("csrr %[scause], scause" :[scause] "=r"(scauseVar));
     if(scauseVar == 0x8000000000000001UL){ //supervisor software interrupt(timer)
         //...
+        /* //ZA ASINHRONU
         TCB::timeSliceCounter++;
         if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()){
             uint64 sepc = r_sepc();
@@ -73,7 +77,7 @@ void Riscv::handleTimerTrap() {
             w_sstatus(sstatus);
             w_sepc(sepc);
         }
-
+        */
         mc_sip(SIP_SSIP); //brisanje bita u supervisor interrupt pending registru
     }
 }

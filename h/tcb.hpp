@@ -19,14 +19,14 @@ public:
     bool isFinished() const { return finished;}
     void setFinished (bool finished){ TCB::finished = finished;}
 
-    uint64 getTimeSlice() const { return timeSlice;}
+    //uint64 getTimeSlice() const { return timeSlice;} // ZA ASINHRONU
 
     static void yield();
 
     static TCB* running;
 
 private:
-    explicit TCB(Body body, uint64 timeSlice) :
+    /*explicit TCB(Body body, uint64 timeSlice) : //ZA ASINHRONU
         body(body),
         stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
         context({
@@ -37,6 +37,17 @@ private:
         finished(false)
     {
         if(body != nullptr) Scheduler::put(this);
+    }*/
+    explicit TCB(Body body) : //ZA ASINHRONU
+            body(body),
+            stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
+            context({
+                            (uint64)&threadWrapper,
+                            stack != nullptr ? (uint64)&stack[STACK_SIZE]: 0
+                    }),
+            finished(false)
+    {
+        if(body != nullptr) Scheduler::put(this);
     }
     struct Context {
         uint64 ra;
@@ -45,7 +56,7 @@ private:
     Body body;//za svaku coroutine pamtimo koje telo ona izvrsava
     uint64 *stack;
     Context context;
-    uint64 timeSlice;
+    //uint64 timeSlice; //ZA ASINHRONU
     bool finished;
 
     friend class Riscv;
@@ -57,10 +68,10 @@ private:
 
     static void dispatch();//vrsi samu promenu konteksta, poziva se u yield
 
-    static uint64 timeSliceCounter;
+    //static uint64 timeSliceCounter; //ZA ASINHRONU
 
     static uint64 constexpr STACK_SIZE  = 1024;
-    static uint64 constexpr TIME_SLICE = 2;
+    // static uint64 constexpr TIME_SLICE = 2; //ZA ASINHRONU
 
 };
 

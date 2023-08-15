@@ -68,8 +68,8 @@ void workerBodyC(){
         printInteger(i);
         printString("\n");
     }
-    //TCB::running->setFinished(true);
-    //TCB::yield();
+    TCB::running->setFinished(true);
+    TCB::yield();
 }
 
 void workerBodyD(){
@@ -95,6 +95,6 @@ void workerBodyD(){
         printString("\n");
     }
 
-    //TCB::running->setFinished(true);
-    //TCB::yield();
+    TCB::running->setFinished(true);
+    TCB::yield();
 }

@@ -58,6 +58,8 @@ int  main() {
    while(1){}
   */
 
+
+   /* // ZA ASINHRONU
     TCB* threads[5];
 
     threads[0] = TCB::createThread(nullptr);
@@ -96,5 +98,30 @@ int  main() {
     }
 
     printString("FInished\n");
+    return 0;
+    */
+
+   //za SINHRONU
+    TCB* threads[3];
+
+    threads[0] = TCB::createThread(nullptr);
+    TCB::running = threads[0];
+
+    threads[1] = TCB::createThread(workerBodyC);
+    printString("ThreadC created\n");
+
+    threads[2] = TCB::createThread(workerBodyD);
+    printString("ThreadD created\n");
+
+    while(! (threads[1]->isFinished() &&
+             threads[2]->isFinished() ))
+    {
+        TCB::yield();
+    }
+
+    for(auto &coroutine : threads){
+        delete coroutine;
+    }
+    printString("Finished\n");
     return 0;
 }
