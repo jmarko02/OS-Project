@@ -1,0 +1,19 @@
+//
+// Created by os on 8/15/23.
+//
+
+#ifndef OS_PROJECT_SYSCALL_C_H
+#define OS_PROJECT_SYSCALL_C_H
+#include "../lib/hw.h"
+
+void* mem_alloc(size_t size);
+int mem_free(void* ptr);
+
+class TCB;
+typedef TCB* thread_t;
+int thread_create(thread_t* handle, void(*start_routine)(void*), void* arg);
+int thread_exit();
+void thread_dispatch();
+void thread_join(thread_t handle);
+
+#endif //OS_PROJECT_SYSCALL_C_H

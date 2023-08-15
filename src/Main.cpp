@@ -11,11 +11,13 @@
 #include "../h/tcb.hpp"
 #include "../h/workers.hpp"
 #include "../h/print.hpp"
+
+#include "../h/syscall_c.h"
 int  main() {
     /*
     MemoryAllocator mem = MemoryAllocator::getInstance();
 
-   void *one = mem.alloc(200);
+    void *one = mem.alloc(200);
     void *two = mem.alloc(200);
     void *three = mem.alloc(500);
     void *four = mem.alloc(150);
@@ -101,6 +103,7 @@ int  main() {
     return 0;
     */
 
+    /*
    //za SINHRONU
     TCB* threads[3];
 
@@ -123,5 +126,12 @@ int  main() {
         delete coroutine;
     }
     printString("Finished\n");
+    return 0;
+     */
+
+    Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
+
+    void* first = mem_alloc(100);
+    mem_free(first);
     return 0;
 }

@@ -41,6 +41,7 @@ private:
     explicit TCB(Body body) : //ZA ASINHRONU
             body(body),
             stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
+
             context({
                             (uint64)&threadWrapper,
                             stack != nullptr ? (uint64)&stack[STACK_SIZE]: 0
@@ -49,12 +50,13 @@ private:
     {
         if(body != nullptr) Scheduler::put(this);
     }
+
     struct Context {
         uint64 ra;
         uint64 sp;
     }; //ostale registre cuvamo na steku
     Body body;//za svaku coroutine pamtimo koje telo ona izvrsava
-    uint64 *stack;
+    uint64 *stack; //bice char* a ne uint64*
     Context context;
     //uint64 timeSlice; //ZA ASINHRONU
     bool finished;
