@@ -57,7 +57,7 @@ void Riscv::handleExcEcallTrap() {
 
             w_a0_stack(a0);
 
-        }else if(a0 == 0x11){
+        }else if(a0 == 0x11){ //thread_create
 
             TCB** handle = (TCB**)a1;
             uint64* stack = (uint64*)a2;
@@ -69,8 +69,20 @@ void Riscv::handleExcEcallTrap() {
             if(handle == nullptr) ret = -1;
             __asm__ volatile ("mv a0, %[rVal]" : : [rVal]"r"(ret));
 
-        } else {
+        } else if(a0 == 0x12) { //thread_exit
+            TCB::running->setFinished(true);
+            TCB* t = TCB::running;
+            TCB::dispatch();
+            delete t;
 
+        } else if(a0 == 0x13){ //thread dispatch()
+            TCB::dispatch();
+
+        } else if(a0 == 0x14){
+            TCB** handle = (TCB**)a1;
+            while(!(*handle)->isFinished()) {
+                TCB::dispatch();
+            }
         }
         w_sstatus(sstatus);
         w_sepc(sepc);

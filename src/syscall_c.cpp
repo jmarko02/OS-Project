@@ -32,3 +32,18 @@ int thread_create(thread_t* handle, void(*start_routine)(void*), void* arg){
     __asm__ volatile("mv %0, a0" : "=r"(a0));
     return a0;
 }
+
+int thread_exit(){
+    PutArguments(0x12);
+    return 0;
+}
+
+void thread_join(){
+    PutArguments(0x13);
+    return;
+}
+
+void thread_join(thread_t handle){
+    PutArguments(0x14, handle);
+    return;
+}

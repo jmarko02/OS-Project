@@ -16,6 +16,10 @@ public:
     void join();
     static void dispatch ();
     static int sleep (time_t);
+
+    //DODATO:
+    static void threadWrapper(void* );
+
 protected:
     Thread ();
     virtual void run () {}
