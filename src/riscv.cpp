@@ -106,16 +106,32 @@ void Riscv::handleExcEcallTrap() {
             w_a0_stack(0); //je l treba nekako da se vrati -1 kao kod greske? kako bi doslo do greske?
 
         } else if (a0 == 0x22) { //sem_close
-
+            _sem* handle = (_sem*)a1;
+            if(!handle) w_a0_stack(-1);
+            else {
+                a0 = handle->close();
+                w_a0_stack(a0);
+            }
         } else if (a0 == 0x23) { //sem_wait
-
+            _sem* handle = (_sem*)a1;
+            if(!handle) w_a0_stack(-1);
+            else {
+                a0 = handle->wait();
+                w_a0_stack(a0);
+            }
         }else if (a0 == 0x24) { //sem_signal
-
+            _sem* handle = (_sem*)a1;
+            if(!handle) w_a0_stack(-1);
+            else {
+                a0 = handle->signal();
+                w_a0_stack(a0);
+            }
         }else if (a0 == 0x31) { //time_sleep
 
         }else if(a0 == 0x41){ //getc
             char c = __getc();
-            w_a0_stack(c);
+            w_a0_stack((long)c);
+
         } else if(a0 == 0x42){ //putc
             __putc((char)a1);
         }

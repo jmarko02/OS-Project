@@ -21,6 +21,9 @@ public:
     bool isFinished() const { return finished;}
     void setFinished (bool finished){ TCB::finished = finished;}
 
+    bool isBlocked() const { return blocked;}
+    void setBlocked(bool blocked){TCB::blocked = blocked;}
+
     uint64 getTimeSlice() const { return timeSlice;} // ZA ASINHRONU
 
     static void yield();
@@ -65,7 +68,8 @@ private:
                 stack != nullptr ? (uint64)&this->stack[DEFAULT_STACK_SIZE]: 0
             }),
             timeSlice(DEFAULT_TIME_SLICE),
-            finished(false)
+            finished(false),
+            blocked(false)
     {
         if(body != nullptr) Scheduler::put(this);
 
@@ -80,8 +84,10 @@ private:
     Context context;
     time_t timeSlice; //ZA ASINHRONU
     bool finished;
+    bool blocked;
+    //cemu filipu sluze finished i sleeping?
 
-
+    friend class _sem;
     friend class Riscv;
 
     static void threadWrapper(); //staticka metoda koja se prva izvrsava za svaku NOVONAPRAVLJENU nit,pozivace body koje je nama bitno da se izvrsava
