@@ -155,7 +155,7 @@ int  main() {
     thread_create(&threads[0],nullptr,nullptr);
     TCB::running = threads[0];
 
-    Riscv::setMode(true);
+   Riscv::setMode(true);
 
     thread_create(&threads[1], userWrapper,nullptr);
 

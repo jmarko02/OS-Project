@@ -9,6 +9,7 @@
 #include "../h/tcb.hpp"
 #include "../h/print.hpp"
 //#include "../h/syscall_c.h"
+#include "../h/_sem.hpp"
 
 
 bool Riscv::userMode = false;
@@ -93,17 +94,29 @@ void Riscv::handleExcEcallTrap() {
         } else if(a0 == 0x13){ //thread dispatch()
             TCB::dispatch();
 
-        } else if(a0 == 0x14){
+        } else if(a0 == 0x14){ //thread_join
             TCB* handle = (TCB*)a1;
             while(!handle->isFinished()) {
                 TCB::dispatch();
             }
-        } else if (a0 == 0x31) {
-            //time_sleep
-        }else if(a0 == 0x41){
+        } else if (a0 == 0x21) { //sem_open
+            _sem* handle = new _sem((unsigned)a2);
+            _sem** h = (_sem**)a1;
+            *(h) = handle;
+            w_a0_stack(0); //je l treba nekako da se vrati -1 kao kod greske? kako bi doslo do greske?
+
+        } else if (a0 == 0x22) { //sem_close
+
+        } else if (a0 == 0x23) { //sem_wait
+
+        }else if (a0 == 0x24) { //sem_signal
+
+        }else if (a0 == 0x31) { //time_sleep
+
+        }else if(a0 == 0x41){ //getc
             char c = __getc();
             w_a0_stack(c);
-        } else if(a0 == 0x42){
+        } else if(a0 == 0x42){ //putc
             __putc((char)a1);
         }
         w_sstatus(sstatus);
@@ -135,8 +148,8 @@ void Riscv::handleTimerTrap() {
         //ZA ASINHRONU
         TCB::timeSliceCounter++;
         if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
-            uint64 sepc = r_sepc();
-            uint64 sstatus = r_sstatus();
+            uint64 volatile sepc = r_sepc();
+            uint64 volatile sstatus = r_sstatus();
             TCB::timeSliceCounter = 0;
             TCB::dispatch();
             w_sstatus(sstatus);

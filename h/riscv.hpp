@@ -79,6 +79,8 @@ public :
 
     static void supervisorTrap();
 
+    static List<_sem> *closedSemaphores;
+
 private:
     static void handleExcEcallTrap();
     static void handleExternalTrap();
