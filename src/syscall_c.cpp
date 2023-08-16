@@ -25,7 +25,7 @@ int mem_free(void* ptr){
 }
 
 int thread_create(thread_t* handle, void(*start_routine)(void*), void* arg){
-    uint64* stack = (uint64*)mem_alloc(DEFAULT_STACK_SIZE);
+    char* stack = (char*)mem_alloc(DEFAULT_STACK_SIZE);
     //uint64* stack = MemoryAllocator::getInstance().alloc((DEFAULT_STACK_SIZE+ MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE+1);
     PutArguments(0x11, handle, stack, start_routine,arg);
     volatile uint64 a0;
@@ -38,7 +38,7 @@ int thread_exit(){
     return 0;
 }
 
-void thread_join(){
+void thread_dispatch(){
     PutArguments(0x13);
     return;
 }
@@ -46,4 +46,49 @@ void thread_join(){
 void thread_join(thread_t handle){
     PutArguments(0x14, handle);
     return;
+}
+
+int sem_open(sem_t* handle, unsigned init) {
+    PutArguments(0x21, handle, init);
+    volatile uint64 a0;
+    __asm__ volatile("mv %0, a0" : "=r"(a0));
+    return a0;
+}
+
+int sem_close(sem_t handle) {
+    PutArguments(0x22, handle);
+    volatile uint64 a0;
+    __asm__ volatile("mv %0, a0" : "=r"(a0));
+    return a0;
+}
+int sem_wait(sem_t handle) {
+    PutArguments(0x23, handle);
+    volatile uint64 a0;
+    __asm__ volatile("mv %0, a0" : "=r"(a0));
+    return a0;
+}
+
+int sem_signal(sem_t handle) {
+    PutArguments(0x24, handle);
+    volatile uint64 a0;
+    __asm__ volatile("mv %0, a0" : "=r"(a0));
+    return a0;
+}
+
+int time_sleep(time_t time) {
+    PutArguments(0x31, time);
+    volatile uint64 a0;
+    __asm__ volatile("mv %0, a0" : "=r"(a0));
+    return a0;
+}
+
+char getc() {
+    PutArguments(0x41);
+    volatile char a0;
+    __asm__ volatile("mv %0, a0" : "=r"(a0));
+    return a0;
+}
+
+void putc(char c) {
+    PutArguments(0x42, c);
 }

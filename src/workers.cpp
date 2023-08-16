@@ -5,7 +5,7 @@
 #include "../lib/hw.h"
 #include "../h/tcb.hpp"
 #include "../h/print.hpp"
-
+/*
 static uint64 fibonacci(uint64 n){
     if(n==0 || n == 1) {return n;}
     if(n % 4 == 0) TCB::yield();
@@ -97,4 +97,4 @@ void workerBodyD(void*){
 
     TCB::running->setFinished(true);
     TCB::yield();
-}
+}*/

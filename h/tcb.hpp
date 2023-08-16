@@ -16,7 +16,7 @@ public:
     using Body = void (*)(void*);
     static TCB *createThread(Body body);
 
-    static TCB *threadCreate(uint64* stack, Body body, void* arg);
+    static TCB *threadCreate(char* stack, Body body, void* arg);
 
     bool isFinished() const { return finished;}
     void setFinished (bool finished){ TCB::finished = finished;}
@@ -29,6 +29,8 @@ public:
 
     void* operator new (size_t);
     void operator delete (void* ptr) noexcept;
+
+
 private:
     /*explicit TCB(Body body, uint64 timeSlice) : //ZA ASINHRONU
         body(body),
@@ -54,20 +56,20 @@ private:
     {
         if(body != nullptr) Scheduler::put(this);
     }*/
-    TCB(uint64* stack, Body body, void* arg ):
+    TCB(char* stack, Body body, void* arg ):
             stack(stack),
             body(body),
             arg(arg),
             context({
                 (uint64)&threadWrapper,
-                stack != nullptr ? (uint64)&this->stack[STACK_SIZE]: 0
+                stack != nullptr ? (uint64)&this->stack[DEFAULT_STACK_SIZE]: 0
             }),
             finished(false)
     {
         if(body != nullptr) Scheduler::put(this);
 
     }
-    uint64 *stack; //bice char* a ne uint64*
+    char *stack; //bice char* a ne uint64*
     Body body;//za svaku coroutine pamtimo koje telo ona izvrsava
     void* arg;
     struct Context {

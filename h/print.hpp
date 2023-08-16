@@ -7,8 +7,8 @@
 
 #include "../lib/hw.h"
 
-extern void printString(char const *string);
-extern void printInteger(uint64 integer);
+extern void printString1(char const *string);
+extern void printInteger1(uint64 integer);
 //extern void printStringForUserMode(char const *string);
 
 #endif //OS_PROJECT_PRINT_HPP

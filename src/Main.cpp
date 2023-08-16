@@ -13,6 +13,14 @@
 #include "../h/print.hpp"
 
 #include "../h/syscall_c.h"
+
+extern void userMain();
+
+
+void userWrapper(void* arg){
+    userMain();
+}
+
 int  main() {
     /*
     MemoryAllocator mem = MemoryAllocator::getInstance();
@@ -136,10 +144,22 @@ int  main() {
     mem_free(first);
     */
 
-     //ZA TREAD_CREATE
+
+    /* //ZA THREAD_CREATE
     TCB* handle ;
     uint64 ret = thread_create(&handle,nullptr,nullptr);
-    printInteger(ret);
+    printInteger(ret);*/
+
+    TCB* threads[2];
+
+    thread_create(&threads[0],nullptr,nullptr);
+    TCB::running = threads[0];
+
+    Riscv::setMode(true);
+
+    thread_create(&threads[1], userWrapper,nullptr);
+
+    thread_join(threads[1]);
 
 
     return 0;

@@ -27,7 +27,7 @@ private:
     thread_t myHandle;
     void (*body)(void*); void* arg;
 };
-/*
+
 class Semaphore {
 public:
     Semaphore (unsigned init = 1);
@@ -43,14 +43,15 @@ public:
 protected:
     PeriodicThread (time_t period);
     virtual void periodicActivation () {}
+    virtual void run() override;
+    virtual ~PeriodicThread() override;
 private:
     time_t period;
 };
 class Console {
 public:
     static char getc ();
-    10
     static void putc (char);
 };
-*/
+
 #endif //OS_PROJECT_SYSCALL_CPP_HPP

@@ -2,7 +2,7 @@
 // Created by os on 7/26/23.
 //
 
-#include "../h/riscv.hpp"
+#include"../h/riscv.hpp"
 #include "../lib/hw.h"
 #include "../h/MemoryAllocator.hpp"
 #include "../lib/console.h"
@@ -10,10 +10,25 @@
 #include "../h/print.hpp"
 //#include "../h/syscall_c.h"
 
+
+bool Riscv::userMode = false;
+
+void Riscv::setMode(bool value){
+    userMode = value;
+}
+
 void Riscv::popSppSpie() { //mora biti non inlline, mora zaista da se pozove ova fja
+
+    if(userMode){
+        mc_sstatus(Riscv::SSTATUS_SPP);
+
+    } else {
+        ms_sstatus(Riscv::SSTATUS_SPP);
+    }
     __asm__ volatile ("csrw sepc, ra");
     __asm__ volatile("sret");
 }
+
 
 void Riscv::handleExcEcallTrap() {
 
@@ -60,14 +75,14 @@ void Riscv::handleExcEcallTrap() {
         }else if(a0 == 0x11){ //thread_create
 
             TCB** handle = (TCB**)a1;
-            uint64* stack = (uint64*)a2;
+            char* stack = (char*)a2;
             TCB::Body start_routine = (TCB::Body)a3;
             void* arg = (void*)a4;
 
             *handle = TCB::threadCreate(stack,start_routine,arg);
             uint64 ret = 0;
             if(handle == nullptr) ret = -1;
-            __asm__ volatile ("mv a0, %[rVal]" : : [rVal]"r"(ret));
+            w_a0_stack(ret);
 
         } else if(a0 == 0x12) { //thread_exit
             TCB::running->setFinished(true);
@@ -79,18 +94,26 @@ void Riscv::handleExcEcallTrap() {
             TCB::dispatch();
 
         } else if(a0 == 0x14){
-            TCB** handle = (TCB**)a1;
-            while(!(*handle)->isFinished()) {
+            TCB* handle = (TCB*)a1;
+            while(!handle->isFinished()) {
                 TCB::dispatch();
             }
+        } else if (a0 == 0x31) {
+            //time_sleep
+        }else if(a0 == 0x41){
+            char c = __getc();
+            w_a0_stack(c);
+        } else if(a0 == 0x42){
+            __putc((char)a1);
         }
         w_sstatus(sstatus);
         w_sepc(sepc);
 
     } else { //unexpected trap cause
         //print scause, sepc and stval
-        printString("ERR: ");
-        printInteger(scauseVar);
+        printString1("ERR: ");
+        printInteger1(scauseVar);
+        while (true);
     }
 
 

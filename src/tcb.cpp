@@ -4,6 +4,7 @@
 #include "../h/tcb.hpp"
 #include "../h/riscv.hpp"
 #include "../h/MemoryAllocator.hpp"
+#include "../h/syscall_c.h"
 
 TCB* TCB::running = nullptr;
 
@@ -13,10 +14,9 @@ TCB* TCB::running = nullptr;
     return new TCB(body);
 }*/
 
-TCB *TCB::threadCreate(uint64 *stack, TCB::Body body, void *arg) {
+TCB *TCB::threadCreate(char *stack, TCB::Body body, void *arg) {
     return new TCB(stack,body,arg);
 }
-
 
 void TCB::yield() {
     Riscv::pushRegisters();
@@ -31,13 +31,14 @@ void TCB::dispatch() {
     running = Scheduler::get();
 
     TCB::contextSwitch(&old->context, &running->context);
-
 }
 
 void TCB::threadWrapper() {
-    //Riscv::popSppSpie();
+    Riscv::popSppSpie();
     running->body(running->arg);
-    //running->setFinished(true);
+    running->setFinished(true);
+    //TCB::dispatch();
+    thread_dispatch();
     //TCB::yield();//posto je ta nit finished , idemo na yield da pocne neka druga da se izvrsava
 }
 
