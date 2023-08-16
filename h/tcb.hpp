@@ -21,7 +21,7 @@ public:
     bool isFinished() const { return finished;}
     void setFinished (bool finished){ TCB::finished = finished;}
 
-    //uint64 getTimeSlice() const { return timeSlice;} // ZA ASINHRONU
+    uint64 getTimeSlice() const { return timeSlice;} // ZA ASINHRONU
 
     static void yield();
 
@@ -64,6 +64,7 @@ private:
                 (uint64)&threadWrapper,
                 stack != nullptr ? (uint64)&this->stack[DEFAULT_STACK_SIZE]: 0
             }),
+            timeSlice(DEFAULT_TIME_SLICE),
             finished(false)
     {
         if(body != nullptr) Scheduler::put(this);
@@ -77,7 +78,7 @@ private:
         uint64 sp;
     }; //ostale registre cuvamo na steku
     Context context;
-    //uint64 timeSlice; //ZA ASINHRONU
+    time_t timeSlice; //ZA ASINHRONU
     bool finished;
 
 
@@ -90,10 +91,7 @@ private:
 
     static void dispatch();//vrsi samu promenu konteksta, poziva se u yield
 
-    //static uint64 timeSliceCounter; //ZA ASINHRONU
-
-    static uint64 constexpr STACK_SIZE  = 1024;
-    // static uint64 constexpr TIME_SLICE = 2; //ZA ASINHRONU
+    static time_t timeSliceCounter; //ZA ASINHRONU
 
 };
 

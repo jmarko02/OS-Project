@@ -132,9 +132,9 @@ void Riscv::handleTimerTrap() {
     __asm__ volatile ("csrr %[scause], scause" :[scause] "=r"(scauseVar));
     if(scauseVar == 0x8000000000000001UL){ //supervisor software interrupt(timer)
         //...
-        /* //ZA ASINHRONU
+        //ZA ASINHRONU
         TCB::timeSliceCounter++;
-        if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()){
+        if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
             uint64 sepc = r_sepc();
             uint64 sstatus = r_sstatus();
             TCB::timeSliceCounter = 0;
@@ -142,7 +142,6 @@ void Riscv::handleTimerTrap() {
             w_sstatus(sstatus);
             w_sepc(sepc);
         }
-        */
         mc_sip(SIP_SSIP); //brisanje bita u supervisor interrupt pending registru
     }
 }
