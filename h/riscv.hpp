@@ -7,6 +7,9 @@
 
 
 #include "../lib/hw.h"
+#include "../h/list.hpp"
+#include "../h/_sem.hpp"
+#include "../h/sleepingThreadsList.hpp"
 //extern "C" void supervisorTrap();
 
 //extern "C" void handleExcEcallTrap();
@@ -82,6 +85,9 @@ public :
     static List<_sem> *closedSemaphores;
 
 private:
+
+    static SleepingThreadList sleepingThreads;
+
     static void handleExcEcallTrap();
     static void handleExternalTrap();
     static void handleTimerTrap();

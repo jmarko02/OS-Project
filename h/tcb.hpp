@@ -18,6 +18,9 @@ public:
 
     static TCB *threadCreate(char* stack, Body body, void* arg);
 
+    bool isSleeping() const { return sleeping;}
+    void setSleeping(bool sleeping) {TCB::sleeping = sleeping;}
+
     bool isFinished() const { return finished;}
     void setFinished (bool finished){ TCB::finished = finished;}
 
@@ -69,7 +72,8 @@ private:
             }),
             timeSlice(DEFAULT_TIME_SLICE),
             finished(false),
-            blocked(false)
+            blocked(false),
+            sleeping(false)
     {
         if(body != nullptr) Scheduler::put(this);
 
@@ -85,6 +89,7 @@ private:
     time_t timeSlice; //ZA ASINHRONU
     bool finished;
     bool blocked;
+    bool sleeping;
     //cemu filipu sluze finished i sleeping?
 
     friend class _sem;

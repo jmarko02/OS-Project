@@ -6,6 +6,7 @@
 #include "../h/tcb.hpp"
 #include "../h/riscv.hpp"
 #include "../h/syscall_c.h"
+#include "../h/MemoryAllocator.hpp"
 
 void *_sem::operator new(size_t size) {
     return MemoryAllocator::getInstance().alloc((size + MEM_BLOCK_SIZE - 1)/MEM_BLOCK_SIZE + 1);
@@ -22,13 +23,13 @@ _sem::~_sem() {
 int _sem::signal() {
     if(closed) return -1;
     value++;
-    if(val <= 0) deblock();
+    if(value <= 0) deblock();
     return 0;
 }
 
 int _sem::wait() {
-    val--;
-    if(val < 0) block();
+    value--;
+    if(value < 0) block();
     if(!closed) {
         return 0;
     }else {
@@ -51,7 +52,7 @@ int _sem::close() {
         }
     }
     Riscv::closedSemaphores->addLast(this);
-    retunr 0;
+    return 0;
 }
 
 void _sem::block() {

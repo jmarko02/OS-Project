@@ -11,8 +11,9 @@
 //#include "../h/syscall_c.h"
 #include "../h/_sem.hpp"
 
-
 bool Riscv::userMode = false;
+SleepingThreadList Riscv::sleepingThreads;
+List<_sem>* Riscv::closedSemaphores;
 
 void Riscv::setMode(bool value){
     userMode = value;
@@ -127,6 +128,14 @@ void Riscv::handleExcEcallTrap() {
                 w_a0_stack(a0);
             }
         }else if (a0 == 0x31) { //time_sleep
+            time_t slice = (time_t)a1;
+
+            if (slice != 0) {
+                TCB::running->setSleeping(true);
+                Riscv::sleepingThreads.put(TCB::running,slice);
+            }
+
+            TCB::dispatch();
 
         }else if(a0 == 0x41){ //getc
             char c = __getc();
@@ -161,6 +170,16 @@ void Riscv::handleTimerTrap() {
     __asm__ volatile ("csrr %[scause], scause" :[scause] "=r"(scauseVar));
     if(scauseVar == 0x8000000000000001UL){ //supervisor software interrupt(timer)
         //...
+        time_t volatile temp = Riscv::sleepingThreads.peekFirstSlice();
+        time_t t1 = -1;
+
+        if(temp != t1){
+            Riscv::sleepingThreads.decFirst();
+            if(Riscv::sleepingThreads.peekFirstSlice() == 0){
+                Riscv::sleepingThreads.removeFinishedThreads();
+            }
+        }
+        mc_sip(SIP_SSIP);
         //ZA ASINHRONU
         TCB::timeSliceCounter++;
         if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
@@ -171,6 +190,6 @@ void Riscv::handleTimerTrap() {
             w_sstatus(sstatus);
             w_sepc(sepc);
         }
-        mc_sip(SIP_SSIP); //brisanje bita u supervisor interrupt pending registru
+       // mc_sip(SIP_SSIP); //brisanje bita u supervisor interrupt pending registru
     }
 }
