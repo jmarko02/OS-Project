@@ -151,6 +151,7 @@ inline void Riscv::w_sip(uint64 sip) {
 }
 
 inline void Riscv::ms_sstatus(uint64 mask) {
+
     __asm__ volatile("csrs sstatus, %[mask]" : : [mask] "r"(mask));
 }
 

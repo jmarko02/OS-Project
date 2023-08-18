@@ -58,8 +58,10 @@ int _sem::close() {
 void _sem::block() {
     numOfBlockedThreads++;
     TCB::running->setBlocked(true);
-    Scheduler::put(TCB::running);
-    thread_dispatch(); //sis poziv u okviru sis poziva???
+    blockedThreads.addLast(TCB::running);
+    //Scheduler::put(TCB::running);
+    //thread_dispatch(); //sis poziv u okviru sis poziva???
+    TCB::dispatch();
 }
 
 void _sem::deblock() {

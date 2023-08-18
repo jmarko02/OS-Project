@@ -15,13 +15,13 @@
 #include "../h/syscall_c.h"
 
 //ZA TESTOVE
-//extern void userMain();
+extern void userMain();
 
-/*ZA TESTOVE
+//ZA TESTOVE
 void userWrapper(void* arg){
     userMain();
 }
-*/
+
 
 void worker1(void*){
     for(int i = 0 ; i < 10; i++){
@@ -160,7 +160,7 @@ int  main() {
 
     Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
 
-    Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
+   // Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
 
     /*
     void* first = mem_alloc(100);
@@ -173,23 +173,28 @@ int  main() {
     uint64 ret = thread_create(&handle,nullptr,nullptr);
     printInteger(ret);*/
 
-    /*
+
     //ZA SEDMI TEST (BEZ SETMODE ZA 1. I 2. TEST)
     TCB* threads[2];
 
     thread_create(&threads[0],nullptr,nullptr);
     TCB::running = threads[0];
 
-   Riscv::setMode(true);
+    //Riscv::setMode(true);
 
     thread_create(&threads[1], userWrapper,nullptr);
 
     thread_join(threads[1]);
-    */
+
+
+
+    /*
     TCB* threads[3];
 
     thread_create(&threads[0],nullptr,nullptr);
     TCB::running = threads[0];
+
+    Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
 
     thread_create(&threads[1], ::worker1,nullptr);
 
@@ -197,6 +202,7 @@ int  main() {
 
     thread_join(threads[1]);
     thread_join(threads[2]);
+    */
 
     return 0;
 }

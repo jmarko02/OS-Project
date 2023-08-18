@@ -44,10 +44,12 @@ void Riscv::handleExcEcallTrap() {
 
     __asm__ volatile ("csrr %[scause], scause" :[scause] "=r"(scauseVar));
 
+    uint64 volatile sepc = r_sepc() + 4;
+    uint64 volatile sstatus = r_sstatus();//psw
+
+
     if(scauseVar == 0x0000000000000008UL || scauseVar == 0x0000000000000009UL){ //S-mode(9), U-mode(8)
 
-       uint64 volatile sepc = r_sepc() + 4;
-       uint64 volatile sstatus = r_sstatus();//psw
 
         //printInteger(a0);
         //printString("\n");
@@ -149,8 +151,13 @@ void Riscv::handleExcEcallTrap() {
 
     } else { //unexpected trap cause
         //print scause, sepc and stval
-        printString1("ERR: ");
+        printString1("ERR: \nscause: ");
         printInteger1(scauseVar);
+        printString1("\nsepc: ");
+        printInteger1(sepc);
+        printString1("\nsstatus: ");
+        printInteger1(sstatus);
+        printString1("\n");
         while (true);
     }
 
