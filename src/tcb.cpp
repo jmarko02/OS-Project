@@ -29,15 +29,16 @@ void TCB::dispatch() {
     TCB* old = running;
     if(!old->isFinished() && !old->isBlocked()) {Scheduler::put(old);}
     running = Scheduler::get();
-
+    if(old->isFinished()) delete old;
     TCB::contextSwitch(&old->context, &running->context);
 }
 
 void TCB::threadWrapper() {
     Riscv::popSppSpie();
     running->body(running->arg);
-    running->setFinished(true);
-    TCB::dispatch();
+    thread_exit();
+//    running->setFinished(true);
+//    TCB::dispatch();
     //thread_dispatch();
     //TCB::yield();//posto je ta nit finished , idemo na yield da pocne neka druga da se izvrsava
 }

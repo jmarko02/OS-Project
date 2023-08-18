@@ -42,6 +42,7 @@ int _sem::wait() {
 }
 
 int _sem::close() {
+
     if(closed) return -1;
     closed = true;
     if(blockedThreads.peekFirst() != nullptr) {

@@ -6,6 +6,8 @@
 #define OS_PROJECT_LIST_HPP
 
 #include "../lib/mem.h"
+#include "../h/MemoryAllocator.hpp"
+#include "../lib/hw.h"
 
 template<typename T>
 class List{
@@ -15,6 +17,14 @@ class List{
         Elem* next;
 
         Elem(T* data, Elem* next) :data(data),next(next){}
+
+        void* operator new (size_t size){
+            return MemoryAllocator::getInstance().alloc((size+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE+1);
+        }
+        void operator delete(void* ptr) noexcept {
+            MemoryAllocator::getInstance().free(ptr);
+        }
+
     };
     Elem* head, *tail;
 

@@ -90,9 +90,7 @@ void Riscv::handleExcEcallTrap() {
 
         } else if(a0 == 0x12) { //thread_exit
             TCB::running->setFinished(true);
-            TCB* t = TCB::running;
             TCB::dispatch();
-            delete t;
 
         } else if(a0 == 0x13){ //thread dispatch()
             TCB::dispatch();
