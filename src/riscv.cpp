@@ -160,7 +160,6 @@ void Riscv::handleExcEcallTrap() {
     }
 
 
-
 }
 void Riscv::handleExternalTrap() {
     uint64 scauseVar;

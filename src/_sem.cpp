@@ -16,6 +16,14 @@ void _sem::operator delete(void *ptr) noexcept {
 MemoryAllocator::getInstance().free(ptr);
 }
 
+void* _sem::Blocked::operator new(size_t size) {
+    return MemoryAllocator::getInstance().alloc((size +  MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE + 1);
+}
+
+void _sem::Blocked::operator delete(void *ptr) noexcept {
+    MemoryAllocator::getInstance().free(ptr);
+}
+
 _sem::~_sem() {
     close();
 }
@@ -45,7 +53,7 @@ int _sem::close() {
 
     if(closed) return -1;
     closed = true;
-    if(blockedThreads.peekFirst() != nullptr) {
+    /*if(blockedThreads.peekFirst() != nullptr) {
         while(blockedThreads.peekFirst()){
             blockedThreads.peekFirst()->setBlocked(false);
             Scheduler::put(blockedThreads.peekFirst());
@@ -53,21 +61,56 @@ int _sem::close() {
         }
     }
     Riscv::closedSemaphores->addLast(this);
+     */
+    if(head != nullptr){
+        while(head){
+            TCB* first = getFirst();
+            first->setBlocked(false);
+            Scheduler::put(first);
+        }
+    }
     return 0;
 }
 
 void _sem::block() {
+
     numOfBlockedThreads++;
     TCB::running->setBlocked(true);
-    blockedThreads.addLast(TCB::running);
+    putLast(TCB::running);
+    //blockedThreads.addLast(TCB::running);
     //Scheduler::put(TCB::running);
     //thread_dispatch(); //sis poziv u okviru sis poziva???
     TCB::dispatch();
+
+
 }
 
 void _sem::deblock() {
     numOfBlockedThreads--;
-    TCB* tmp = blockedThreads.removeFirst();
+    TCB* tmp = getFirst();
+    //TCB* tmp = blockedThreads.removeFirst();
     tmp->setBlocked(false);
     Scheduler::put(tmp);
+}
+
+TCB *_sem::getFirst() {
+    if(head == nullptr) return nullptr;
+    TCB* ret = head->thread;
+    Blocked* old = head;
+    head = head->next;
+    if(!head) tail = nullptr;
+
+    delete old;
+    return ret;
+
+}
+
+void _sem::putLast(TCB *thread) {
+    Blocked* newElement = new Blocked(thread,nullptr);
+    if(head == nullptr){
+        head = tail = newElement;
+    } else {
+        tail->next = newElement;
+        tail = newElement;
+    }
 }
