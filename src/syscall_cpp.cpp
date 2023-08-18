@@ -76,7 +76,7 @@ void PeriodicThread::terminate() {
 }
 
 PeriodicThread::PeriodicThread(time_t period) {
-    this->period = 0;
+    this->period = period;
 }
 
 void PeriodicThread::run() {
@@ -87,7 +87,9 @@ void PeriodicThread::run() {
 }
 
 PeriodicThread::~PeriodicThread() {
-    terminate();
+    terminate(); //da li treba ovo? ili destruktor ne treba da radi nista posto je terminate public metoda pa ce je pozivati korisnik?
+    //napravi klasu izvedenu iz periodicThread , redefinisi periodic activation , napravi dva objekta i vidi sta se desava
+
 }
 
 char Console::getc() {

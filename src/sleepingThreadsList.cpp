@@ -12,7 +12,7 @@ void SleepingThreadList::decFirst() {
 
 time_t SleepingThreadList::peekFirstSlice() {
     if(!head) {
-        return -1;
+        return 0;
     }
     return head->relativeTime;
 }

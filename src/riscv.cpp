@@ -130,11 +130,11 @@ void Riscv::handleExcEcallTrap() {
         }else if (a0 == 0x31) { //time_sleep
             time_t slice = (time_t)a1;
 
-            if (slice != 0) {
-                TCB::running->setSleeping(true);
-                Riscv::sleepingThreads.put(TCB::running,slice);
+            if (slice == 0) {
+                w_a0_stack(-1);
             }
-
+            TCB::running->setSleeping(true);
+            Riscv::sleepingThreads.put(TCB::running,slice);
             TCB::dispatch();
 
         }else if(a0 == 0x41){ //getc
@@ -170,13 +170,14 @@ void Riscv::handleExternalTrap() {
 }
 
 void Riscv::handleTimerTrap() {
-    uint64 scauseVar;
+    uint64 volatile scauseVar;
     __asm__ volatile ("csrr %[scause], scause" :[scause] "=r"(scauseVar));
     if(scauseVar == 0x8000000000000001UL){ //supervisor software interrupt(timer)
         //...
         time_t volatile temp = Riscv::sleepingThreads.peekFirstSlice();
-        time_t t1 = -1;
-
+        time_t volatile t1 = 0;
+        //printInteger1((int)temp);
+        //printString1("\n");
         if(temp != t1){
             Riscv::sleepingThreads.decFirst();
             if(Riscv::sleepingThreads.peekFirstSlice() == 0){
