@@ -82,7 +82,6 @@ void _sem::block() {
     //thread_dispatch(); //sis poziv u okviru sis poziva???
     TCB::dispatch();
 
-
 }
 
 void _sem::deblock() {

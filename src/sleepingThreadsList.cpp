@@ -6,7 +6,9 @@
 
 void SleepingThreadList::decFirst() {
     if(head != nullptr){
-        head->relativeTime-=1;
+        if(head->relativeTime !=0){
+            head->relativeTime-=1;
+        }
     }
 }
 

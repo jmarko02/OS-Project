@@ -37,6 +37,7 @@ void worker2(void*){
         printString1("2: i=");
         printInteger1(i);
         printString1("\n");
+        time_sleep(20);
 
     }
     thread_exit();
@@ -158,9 +159,8 @@ int  main() {
     return 0;
      */
 
-    Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
-
-   // Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
+    //Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
+    //Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
 
     /*
     void* first = mem_alloc(100);
@@ -175,34 +175,45 @@ int  main() {
 
 
     //ZA SEDMI TEST (BEZ SETMODE ZA 1. I 2. TEST)
+
+
+    Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
     TCB* threads[2];
 
     thread_create(&threads[0],nullptr,nullptr);
     TCB::running = threads[0];
 
+    //Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
     Riscv::setMode(true);
 
     thread_create(&threads[1], userWrapper,nullptr);
 
     thread_join(threads[1]);
-
-
+    //thread_dispatch();
+    //thread_exit(); //nakon svakog testa izlazi error 5
 
     /*
+    Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
     TCB* threads[3];
 
     thread_create(&threads[0],nullptr,nullptr);
     TCB::running = threads[0];
-
     Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
+
+    printString1("AAA\n");
+    //Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
 
     thread_create(&threads[1], ::worker1,nullptr);
 
     thread_create(&threads[2], ::worker2,nullptr);
 
-    thread_join(threads[1]);
+    printString1("AAA\n");
+
+    //thread_join(threads[1]);
+    printString1("AAA\n");
     thread_join(threads[2]);
-    */
+    */ //kada se stavi join ne radi, kada se ne stavi join ->radi sleep lepo ;
+    // kako su svi testovi radili iako sam imao join na kraju main
 
     return 0;
 }

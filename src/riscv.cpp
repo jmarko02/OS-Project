@@ -133,9 +133,11 @@ void Riscv::handleExcEcallTrap() {
             if (slice == 0) {
                 w_a0_stack(-1);
             }
-            TCB::running->setSleeping(true);
-            Riscv::sleepingThreads.put(TCB::running,slice);
-            TCB::dispatch();
+            if(slice != 0){
+                TCB::running->setSleeping(true);
+                Riscv::sleepingThreads.put(TCB::running,slice);
+                TCB::dispatch();
+            }
 
         }else if(a0 == 0x41){ //getc
             char c = __getc();
