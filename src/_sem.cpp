@@ -41,11 +41,7 @@ int _sem::wait() {
     if(!closed) {
         return 0;
     }else {
-        if(numOfBlockedThreads == 0) return 0;
-        else {
-            numOfBlockedThreads--;
-            return -1;
-        }
+        return -1;
     }
 }
 

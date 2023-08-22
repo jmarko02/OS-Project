@@ -1,6 +1,8 @@
 #include "../lib/console.h"
 #include "../h/MemoryAllocator.hpp"
 #include "../h/riscv.hpp"
+#include "../h/print.hpp"
+#include "../h/syscall_cpp.hpp"
 
 //extern "C" void supervisorTrap();
 
@@ -20,6 +22,10 @@ extern void userMain();
 //ZA TESTOVE
 void userWrapper(void* arg){
     userMain();
+}
+
+void Idle(void*){
+    while(true){thread_dispatch();}
 }
 
 
@@ -43,6 +49,15 @@ void worker2(void*){
     thread_exit();
 }
 
+class PeriNit : public PeriodicThread {
+    void periodicActivation() override;
+public:
+    PeriNit() : PeriodicThread(5){}
+};
+
+void PeriNit::periodicActivation() {
+    printString1("Yee");
+}
 int  main() {
     /*
     MemoryAllocator mem = MemoryAllocator::getInstance();
@@ -178,20 +193,27 @@ int  main() {
 
 
     Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
-    TCB* threads[2];
+    TCB* threads[3];
 
     thread_create(&threads[0],nullptr,nullptr);
     TCB::running = threads[0];
 
-    //Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
+    Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
     Riscv::setMode(true);
 
-    thread_create(&threads[1], userWrapper,nullptr);
+    thread_create(&threads[1],Idle,nullptr);
 
-    thread_join(threads[1]);
+    PeriNit* oprana = new PeriNit();
+
+    oprana->start();
+
+    thread_create(&threads[2], userWrapper,nullptr);
+
+    thread_join(threads[2]);
     //thread_dispatch();
     //thread_exit(); //nakon svakog testa izlazi error 5
 
+    oprana->terminate();
     /*
     Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
     TCB* threads[3];

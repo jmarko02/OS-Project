@@ -37,8 +37,8 @@ void TCB::threadWrapper() {
     Riscv::popSppSpie();
     running->body(running->arg);
     thread_exit();
-//    running->setFinished(true);
-//    TCB::dispatch();
+    //running->setFinished(true);
+    //TCB::dispatch();
     //thread_dispatch();
     //TCB::yield();//posto je ta nit finished , idemo na yield da pocne neka druga da se izvrsava
 }
