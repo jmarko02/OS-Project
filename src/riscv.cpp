@@ -142,12 +142,10 @@ void Riscv::handleExcEcallTrap() {
             w_a0_stack((long)c);*/
 
             char ret = -1;
-            if (inputBuffer->empty()) {
-                ret = -1;
-
-            } else {
-                ret = inputBuffer->getChar();
+            while (inputBuffer->empty()) {
+                TCB::dispatch();
             }
+            ret = inputBuffer->getChar();
             w_a0_stack((long)ret);
 
 
@@ -177,8 +175,6 @@ void Riscv::handleExcEcallTrap() {
 }
 void Riscv::handleExternalTrap() {
 
-    //console_handler();
-
     volatile int interruptNum = plic_claim();
 
     while(!inputBuffer->full() && *((char*)(CONSOLE_STATUS)) & CONSOLE_RX_STATUS_BIT){
@@ -190,31 +186,25 @@ void Riscv::handleExternalTrap() {
 }
 
 void Riscv::handleTimerTrap() {
-    uint64 volatile scauseVar; //SKLONI SCAUSE I IF
-    __asm__ volatile ("csrr %[scause], scause" :[scause] "=r"(scauseVar));
-    if(scauseVar == 0x8000000000000001UL){ //supervisor software interrupt(timer)
-        //...
-        time_t volatile temp = Riscv::sleepingThreads.peekFirstSlice();
-        time_t volatile t1 = 0;
-        //printInteger1((int)temp);
-        //printString1("\n");
-        if(temp != t1){
-            Riscv::sleepingThreads.decFirst();
-            if(Riscv::sleepingThreads.peekFirstSlice() == 0){
-                Riscv::sleepingThreads.removeFinishedThreads();
-            }
+    time_t volatile temp = Riscv::sleepingThreads.peekFirstSlice();
+    time_t volatile t1 = 0;
+    //printInteger1((int)temp);
+    //printString1("\n");
+    if(temp != t1){
+        Riscv::sleepingThreads.decFirst();
+        if(Riscv::sleepingThreads.peekFirstSlice() == 0){
+            Riscv::sleepingThreads.removeFinishedThreads();
         }
-        mc_sip(SIP_SSIP);
-        //ZA ASINHRONU
-        TCB::timeSliceCounter++;
-        if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
-            uint64 volatile sepc = r_sepc();
-            uint64 volatile sstatus = r_sstatus();
-            TCB::timeSliceCounter = 0;
-            TCB::dispatch();
-            w_sstatus(sstatus);
-            w_sepc(sepc);
-        }
-       // mc_sip(SIP_SSIP); //brisanje bita u supervisor interrupt pending registru
+    }
+    mc_sip(SIP_SSIP);
+    //ZA ASINHRONU
+    TCB::timeSliceCounter++;
+    if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
+        uint64 volatile sepc = r_sepc();
+        uint64 volatile sstatus = r_sstatus();
+        TCB::timeSliceCounter = 0;
+        TCB::dispatch();
+        w_sstatus(sstatus);
+        w_sepc(sepc);
     }
 }

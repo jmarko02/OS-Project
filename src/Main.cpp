@@ -24,10 +24,8 @@ void userWrapper(void* arg){
     userMain();
 }
 
-bool finished = false;
-
 void ConsoleThread(void*){
-    while(!Riscv::outputBuffer->empty() || !finished){
+    while(true){
         while(!Riscv::outputBuffer->empty() && *((char*)(CONSOLE_STATUS)) & CONSOLE_TX_STATUS_BIT){
             char c = Riscv::outputBuffer->getChar();
             *(char*)CONSOLE_TX_DATA = c;
@@ -222,7 +220,6 @@ int  main() {
     thread_create(&threads[2], userWrapper,nullptr);
 
     thread_join(threads[2]);
-    finished = true;
     //thread_dispatch();
     //thread_exit(); //nakon svakog testa izlazi error 5
 
