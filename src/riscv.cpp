@@ -11,19 +11,14 @@
 //#include "../h/syscall_c.h"
 #include "../h/_sem.hpp"
 
-bool Riscv::userMode = false;
 SleepingThreadList Riscv::sleepingThreads;
 List<_sem>* Riscv::closedSemaphores;
 BoundedBuffer* Riscv::inputBuffer = nullptr;
 BoundedBuffer* Riscv::outputBuffer = nullptr;
 
-void Riscv::setMode(bool value){
-    userMode = value;
-}
-
 void Riscv::popSppSpie() { //mora biti non inlline, mora zaista da se pozove ova fja
 
-    if(userMode){
+    if(TCB::running->userMode){
         mc_sstatus(Riscv::SSTATUS_SPP);
 
     } else {

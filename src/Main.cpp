@@ -212,7 +212,6 @@ int  main() {
     Riscv::outputBuffer = new BoundedBuffer();
 
     Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
-    Riscv::setMode(true);
 
     thread_create(&threads[1],ConsoleThread,nullptr);
 

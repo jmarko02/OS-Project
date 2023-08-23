@@ -77,10 +77,6 @@ public :
     static uint64 r_a4();
     static void w_a4(uint64 a4);
 
-
-    static bool userMode;
-    static void setMode(bool value);
-
     static BoundedBuffer* inputBuffer;
     static BoundedBuffer* outputBuffer;
 

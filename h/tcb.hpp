@@ -33,6 +33,8 @@ public:
 
     static TCB* running;
 
+    bool userMode;
+
     void* operator new (size_t);
     void operator delete (void* ptr) noexcept;
 
@@ -64,6 +66,7 @@ private:
     }*/
 public:
     TCB(char* stack, Body body, void* arg ):
+            userMode(stack != nullptr),
             stack(stack),
             body(body),
             arg(arg),
