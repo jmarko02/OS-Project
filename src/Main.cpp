@@ -195,17 +195,20 @@ int  main() {
     Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
     TCB* threads[3];
 
-    thread_create(&threads[0],nullptr,nullptr);
-    TCB::running = threads[0];
+    //thread_create(&threads[0],nullptr,nullptr);
+    //TCB::running = threads[0];
+
+    TCB::running = new TCB(nullptr, nullptr, nullptr);
+
 
     Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
     Riscv::setMode(true);
 
     thread_create(&threads[1],Idle,nullptr);
 
-    PeriNit* oprana = new PeriNit();
+    //PeriNit* oprana = new PeriNit();
 
-    oprana->start();
+    //oprana->start();
 
     thread_create(&threads[2], userWrapper,nullptr);
 
@@ -213,7 +216,7 @@ int  main() {
     //thread_dispatch();
     //thread_exit(); //nakon svakog testa izlazi error 5
 
-    oprana->terminate();
+    //oprana->terminate();
     /*
     Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
     TCB* threads[3];

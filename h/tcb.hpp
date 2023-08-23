@@ -62,6 +62,7 @@ private:
     {
         if(body != nullptr) Scheduler::put(this);
     }*/
+public:
     TCB(char* stack, Body body, void* arg ):
             stack(stack),
             body(body),
@@ -78,6 +79,7 @@ private:
         if(body != nullptr) Scheduler::put(this);
 
     }
+private:
     char *stack; //bice char* a ne uint64*
     Body body;//za svaku coroutine pamtimo koje telo ona izvrsava
     void* arg;

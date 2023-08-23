@@ -73,19 +73,20 @@ void Riscv::handleExcEcallTrap() {
         else if(a0 == 0x02){
             //printInteger(a0);
             a0 = MemoryAllocator::getInstance().free((void*)a1);
-
             w_a0_stack(a0);
 
         }else if(a0 == 0x11){ //thread_create
 
             TCB** handle = (TCB**)a1;
-            char* stack = (char*)a2;
-            TCB::Body start_routine = (TCB::Body)a3;
-            void* arg = (void*)a4;
+            TCB::Body start_routine = (TCB::Body)a2;
+            void* arg = (void*)a3;
+            char* stack = (char*)a4;
 
-            *handle = TCB::threadCreate(stack,start_routine,arg);
             uint64 ret = 0;
-            if(handle == nullptr) ret = -1;
+            if (!handle) ret = -1;
+
+            if (!ret) *handle = TCB::threadCreate(stack,start_routine,arg);
+            if(*handle == nullptr) ret = -1;
             w_a0_stack(ret);
 
         } else if(a0 == 0x12) { //thread_exit
@@ -172,7 +173,7 @@ void Riscv::handleExternalTrap() {
 }
 
 void Riscv::handleTimerTrap() {
-    uint64 volatile scauseVar;
+    uint64 volatile scauseVar; //SKLONI SCAUSE I IF
     __asm__ volatile ("csrr %[scause], scause" :[scause] "=r"(scauseVar));
     if(scauseVar == 0x8000000000000001UL){ //supervisor software interrupt(timer)
         //...

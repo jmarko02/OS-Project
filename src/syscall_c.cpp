@@ -25,9 +25,9 @@ int mem_free(void* ptr){
 }
 
 int thread_create(thread_t* handle, void(*start_routine)(void*), void* arg){
-    //char* stack = (char*)mem_alloc(DEFAULT_STACK_SIZE);
-    char* stack = (char*)MemoryAllocator::getInstance().alloc((DEFAULT_STACK_SIZE+ MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE+1);
-    PutArguments(0x11, handle, stack, start_routine,arg);
+    char* stack = (char*)mem_alloc(DEFAULT_STACK_SIZE);
+    //char* stack = (char*)MemoryAllocator::getInstance().alloc((DEFAULT_STACK_SIZE+ MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE+1);
+    PutArguments(0x11, handle, start_routine,arg, stack);
     volatile uint64 a0;
     __asm__ volatile("mv %0, a0" : "=r"(a0));
     return a0;
