@@ -10,6 +10,7 @@
 #include "../h/list.hpp"
 #include "../h/_sem.hpp"
 #include "../h/sleepingThreadsList.hpp"
+#include "../h/BoundedBuffer.hpp"
 //extern "C" void supervisorTrap();
 
 //extern "C" void handleExcEcallTrap();
@@ -79,6 +80,10 @@ public :
 
     static bool userMode;
     static void setMode(bool value);
+
+    static BoundedBuffer* inputBuffer;
+    static BoundedBuffer* outputBuffer;
+
 
     static void supervisorTrap();
 

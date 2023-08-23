@@ -14,6 +14,8 @@
 bool Riscv::userMode = false;
 SleepingThreadList Riscv::sleepingThreads;
 List<_sem>* Riscv::closedSemaphores;
+BoundedBuffer* Riscv::inputBuffer = nullptr;
+BoundedBuffer* Riscv::outputBuffer = nullptr;
 
 void Riscv::setMode(bool value){
     userMode = value;
@@ -141,11 +143,25 @@ void Riscv::handleExcEcallTrap() {
             }
 
         }else if(a0 == 0x41){ //getc
-            char c = __getc();
-            w_a0_stack((long)c);
+            /*char c = __getc();
+            w_a0_stack((long)c);*/
+
+            char ret = -1;
+            if (inputBuffer->empty()) {
+                ret = -1;
+
+            } else {
+                ret = inputBuffer->getChar();
+            }
+            w_a0_stack((long)ret);
+
 
         } else if(a0 == 0x42){ //putc
-            __putc((char)a1);
+            //__putc((char)a1);
+
+            char c = a1;
+            outputBuffer->putChar(c);
+
         }
         w_sstatus(sstatus);
         w_sepc(sepc);
@@ -165,11 +181,17 @@ void Riscv::handleExcEcallTrap() {
 
 }
 void Riscv::handleExternalTrap() {
-    uint64 scauseVar;
-    __asm__ volatile ("csrr %[scause], scause" :[scause] "=r"(scauseVar));
-    if(scauseVar == 0x8000000000000009UL){ //supervisor external interrupt
-        console_handler();
-    }//dok se ne stigne do konzole
+
+    //console_handler();
+
+    volatile int interruptNum = plic_claim();
+
+    while(!inputBuffer->full() && *((char*)(CONSOLE_STATUS)) & CONSOLE_RX_STATUS_BIT){
+        char c = (*(char*)CONSOLE_RX_DATA);
+        inputBuffer->putChar(c);
+    }
+    plic_complete(interruptNum);
+
 }
 
 void Riscv::handleTimerTrap() {
