@@ -25,7 +25,7 @@ void TCB::yield() {
    // __asm__ volatile ("ecall");
 }
 
-void TCB::dispatch() {
+void TCB::dispatch() { //pri svakom dispatchu treba da se stavi timeSliceCounter na 0
     TCB* old = running;
     if(!old->isFinished() && !old->isBlocked() && !old->isSleeping()) {Scheduler::put(old);}
     running = Scheduler::get();

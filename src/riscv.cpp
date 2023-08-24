@@ -91,19 +91,33 @@ void Riscv::handleExcEcallTrap() {
             TCB::dispatch();
 
         } else if(a0 == 0x13){ //thread dispatch()
+        //  timeSliceCounter = 0;
             TCB::dispatch();
 
         } else if(a0 == 0x14){ //thread_join
             TCB* handle = (TCB*)a1;
+           // if(handle != nullptr){
             while(!handle->isFinished()) {
                 TCB::dispatch();
             }
+            //}
+          
         } else if (a0 == 0x21) { //sem_open
             _sem* handle = new _sem((unsigned)a2);
-            _sem** h = (_sem**)a1;
-            *(h) = handle;
-            w_a0_stack(0); //je l treba nekako da se vrati -1 kao kod greske? kako bi doslo do greske?
+            if(handle == nullptr) {
+                w_a0_stack(0);
+            } else {
+                 _sem** h = (_sem**)a1;
+                if(h == nullptr) {
+                    w_a0_stack(-1);
+                } else {
+                    *(h) = handle;
+                    w_a0_stack(0); //je l treba nekako da se vrati -1 kao kod greske? kako bi doslo do greske?
 
+                }
+                
+            }
+           
         } else if (a0 == 0x22) { //sem_close
             _sem* handle = (_sem*)a1;
             if(!handle) w_a0_stack(-1);

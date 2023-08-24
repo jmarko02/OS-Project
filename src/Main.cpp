@@ -23,17 +23,26 @@ extern void userMain();
 void userWrapper(void* arg){
     userMain();
 }
+void Idle (void*){
+    while(true){
+        thread_dispatch();
+    }
+}
+
+
+TCB* userThread = nullptr;
 
 void ConsoleThread(void*){
-    while(true){
-        while(!Riscv::outputBuffer->empty() && *((char*)(CONSOLE_STATUS)) & CONSOLE_TX_STATUS_BIT){
+    while(!Riscv::outputBuffer->empty() || !userThread->isFinished()){
+         while(!Riscv::outputBuffer->empty() && *((char*)(CONSOLE_STATUS)) & CONSOLE_TX_STATUS_BIT){
             char c = Riscv::outputBuffer->getChar();
             *(char*)CONSOLE_TX_DATA = c;
         }
         thread_dispatch();
     }
+   
+    
 }
-
 
 void worker1(void*){
     for(int i = 0 ; i < 10; i++){
@@ -199,7 +208,7 @@ int  main() {
 
 
     Riscv::w_stvec((uint64)&Riscv::supervisorTrap+1);
-    TCB* threads[3];
+    TCB* threads[2];
 
     //thread_create(&threads[0],nullptr,nullptr);
     //TCB::running = threads[0];
@@ -211,15 +220,20 @@ int  main() {
 
     Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
 
-    thread_create(&threads[1],ConsoleThread,nullptr);
+    thread_create(&threads[0],ConsoleThread,nullptr);
+    
+    thread_create(&threads[1],Idle,nullptr);
 
     //PeriNit* oprana = new PeriNit();
 
     //oprana->start();
 
-    thread_create(&threads[2], userWrapper,nullptr);
-
-    thread_join(threads[2]);
+    thread_create(&userThread, userWrapper,nullptr);
+    
+    thread_join(threads[0]);
+    //thread_join(threads[2]);
+    
+    //thread_join(threads[3]);
     //thread_dispatch();
     //thread_exit(); //nakon svakog testa izlazi error 5
 
