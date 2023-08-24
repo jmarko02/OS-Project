@@ -4,7 +4,8 @@
 
 #ifndef OS_PROJECT__SEM_HPP
 #define OS_PROJECT__SEM_HPP
-#include "../h/list.hpp"
+
+#include "../lib/hw.h"
 
 class TCB;
 
@@ -45,7 +46,6 @@ private:
     bool closed;
     int numOfBlockedThreads = 0;
 
-    List<TCB> blockedThreads;
 };
 
 #endif //OS_PROJECT__SEM_HPP
