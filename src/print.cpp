@@ -3,13 +3,14 @@
 //
 
 #include "../h/print.hpp"
-#include "../lib/console.h"
 #include "../h/riscv.hpp"
+#include "../h/syscall_c.h"
 void printString1(char const* string){
 
-
+    
     while(*string != '\0'){
-        __putc(*string);
+
+        putc(*string);
         string++;
     }
 
@@ -37,6 +38,6 @@ void printInteger1(uint64 integer){
     } while((x/=10) != 0);
 
     if(neg) buf[i++] = '-';
-    while(--i >= 0) __putc(buf[i]);
+    while(--i >= 0) putc(buf[i]);
 
 }

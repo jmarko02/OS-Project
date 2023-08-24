@@ -28,8 +28,6 @@ int sem_signal(sem_t id);
 typedef unsigned long  time_t;
 int time_sleep(time_t);
 
-
-
 char getc();
 void putc(char);
 

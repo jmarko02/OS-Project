@@ -6,7 +6,7 @@
 
 MemoryAllocator::MemoryAllocator() {
     uint64 heapSize = (uint64)HEAP_END_ADDR - (uint64)HEAP_START_ADDR; //in bytes
-    uint64 blocksOnHeap = heapSize / MEM_BLOCK_SIZE; //+1?
+    uint64 blocksOnHeap = heapSize / MEM_BLOCK_SIZE; 
 
     freeHead = (FreeNode*)HEAP_START_ADDR;
     freeHead->size = blocksOnHeap;
@@ -18,13 +18,10 @@ MemoryAllocator& MemoryAllocator::getInstance() {
     static MemoryAllocator instance;
     return instance;
 }
-//ova fja nije potrebna?
-size_t MemoryAllocator::BytesToBlocks(size_t bytes) {
-    return (bytes + MEM_BLOCK_SIZE - 1)/MEM_BLOCK_SIZE  + 1;
-}
 
 void *MemoryAllocator::alloc(size_t blockCount) {
-    //size_t blockCount = BytesToBlocks(sizeInBytes);
+
+    if(blockCount <= 0 ) return nullptr;
 
     for(FreeNode* cur = freeHead; cur != nullptr; cur = cur->next){
         if(cur->size >= blockCount) { //first fit
@@ -55,7 +52,6 @@ void *MemoryAllocator::alloc(size_t blockCount) {
                 *(size_t*)cur = blockCount;
                 void* returnPointer = (char*)cur + 1*MEM_BLOCK_SIZE;
                 return returnPointer;
-
             }
         }
     }

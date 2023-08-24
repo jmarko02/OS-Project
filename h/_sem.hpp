@@ -20,13 +20,10 @@ public:
 
         void* operator new (size_t size);
         void operator delete(void* ptr) noexcept ;
-
-
     };
 
     Blocked* head= nullptr;
     Blocked* tail = nullptr;
-
 
     _sem(unsigned val):value(val),closed(false){}
     ~_sem();
@@ -48,10 +45,7 @@ private:
     bool closed;
     int numOfBlockedThreads = 0;
 
-
-
     List<TCB> blockedThreads;
-
 };
 
 #endif //OS_PROJECT__SEM_HPP

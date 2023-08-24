@@ -10,22 +10,11 @@ TCB* TCB::running = nullptr;
 
 time_t TCB::timeSliceCounter = 0;
 
-/*TCB *TCB::createThread(Body body){
-    return new TCB(body);
-}*/
-
 TCB *TCB::threadCreate(char *stack, TCB::Body body, void *arg) {
     return new TCB(stack,body,arg);
 }
 
-void TCB::yield() {
-    Riscv::pushRegisters();
-    TCB::dispatch();
-    Riscv::popRegisters();
-   // __asm__ volatile ("ecall");
-}
-
-void TCB::dispatch() { //pri svakom dispatchu treba da se stavi timeSliceCounter na 0
+void TCB::dispatch() { 
     TCB* old = running;
     if(!old->isFinished() && !old->isBlocked() && !old->isSleeping()) {Scheduler::put(old);}
     running = Scheduler::get();
@@ -37,10 +26,6 @@ void TCB::threadWrapper() {
     Riscv::popSppSpie();
     running->body(running->arg);
     thread_exit();
-    //running->setFinished(true);
-    //TCB::dispatch();
-    //thread_dispatch();
-    //TCB::yield();//posto je ta nit finished , idemo na yield da pocne neka druga da se izvrsava
 }
 
 void *TCB::operator new(size_t size) {

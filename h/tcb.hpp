@@ -27,9 +27,7 @@ public:
     bool isBlocked() const { return blocked;}
     void setBlocked(bool blocked){TCB::blocked = blocked;}
 
-    uint64 getTimeSlice() const { return timeSlice;} // ZA ASINHRONU
-
-    static void yield();
+    uint64 getTimeSlice() const { return timeSlice;} 
 
     static TCB* running;
 
@@ -37,34 +35,8 @@ public:
 
     void* operator new (size_t);
     void operator delete (void* ptr) noexcept;
+    
 
-
-private:
-    /*explicit TCB(Body body, uint64 timeSlice) : //ZA ASINHRONU
-        body(body),
-        stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
-        context({
-                        (uint64)&threadWrapper,
-                    stack != nullptr ? (uint64)&stack[STACK_SIZE]: 0
-            }),
-        timeSlice(timeSlice),
-        finished(false)
-    {
-        if(body != nullptr) Scheduler::put(this);
-    }*/
-    /*explicit TCB(Body body) : //ZA ASINHRONU
-            body(body),
-            stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
-
-            context({
-                            (uint64)&threadWrapper,
-                            stack != nullptr ? (uint64)&stack[STACK_SIZE]: 0
-                    }),
-            finished(false)
-    {
-        if(body != nullptr) Scheduler::put(this);
-    }*/
-public:
     TCB(char* stack, Body body, void* arg ):
             userMode(stack != nullptr),
             stack(stack),
@@ -82,32 +54,31 @@ public:
         if(body != nullptr) Scheduler::put(this);
 
     }
+
 private:
-    char *stack; //bice char* a ne uint64*
-    Body body;//za svaku coroutine pamtimo koje telo ona izvrsava
+    char *stack; 
+    Body body;
     void* arg;
     struct Context {
         uint64 ra;
         uint64 sp;
-    }; //ostale registre cuvamo na steku
+    }; 
     Context context;
-    time_t timeSlice; //ZA ASINHRONU
+    time_t timeSlice; 
     bool finished;
     bool blocked;
     bool sleeping;
-    //cemu filipu sluze finished i sleeping?
 
     friend class _sem;
     friend class Riscv;
 
-    static void threadWrapper(); //staticka metoda koja se prva izvrsava za svaku NOVONAPRAVLJENU nit,pozivace body koje je nama bitno da se izvrsava
-    //uvek cemo zeleti da izvrsavanje zapocne od threadWrappera
+    static void threadWrapper(); //staticka metoda koja se prva izvrsava za svaku NOVONAPRAVLJENU nit
 
     static void contextSwitch(Context* oldContext, Context* runningContext);
 
-    static void dispatch();//vrsi samu promenu konteksta, poziva se u yield
+    static void dispatch();
 
-    static time_t timeSliceCounter; //ZA ASINHRONU
+    static time_t timeSliceCounter; 
 
 };
 

@@ -5,18 +5,15 @@
 #include"../h/riscv.hpp"
 #include "../lib/hw.h"
 #include "../h/MemoryAllocator.hpp"
-#include "../lib/console.h"
 #include "../h/tcb.hpp"
 #include "../h/print.hpp"
-//#include "../h/syscall_c.h"
 #include "../h/_sem.hpp"
 
 SleepingThreadList Riscv::sleepingThreads;
-List<_sem>* Riscv::closedSemaphores;
 BoundedBuffer* Riscv::inputBuffer = nullptr;
 BoundedBuffer* Riscv::outputBuffer = nullptr;
 
-void Riscv::popSppSpie() { //mora biti non inlline, mora zaista da se pozove ova fja
+void Riscv::popSppSpie() { //mora biti non inline, mora zaista da se pozove ova fja
 
     if(TCB::running->userMode){
         mc_sstatus(Riscv::SSTATUS_SPP);
@@ -27,7 +24,6 @@ void Riscv::popSppSpie() { //mora biti non inlline, mora zaista da se pozove ova
     __asm__ volatile ("csrw sepc, ra");
     __asm__ volatile("sret");
 }
-
 
 void Riscv::handleExcEcallTrap() {
 
@@ -44,31 +40,15 @@ void Riscv::handleExcEcallTrap() {
     uint64 volatile sepc = r_sepc() + 4;
     uint64 volatile sstatus = r_sstatus();//psw
 
-
     if(scauseVar == 0x0000000000000008UL || scauseVar == 0x0000000000000009UL){ //S-mode(9), U-mode(8)
 
+        if(a0 == 0x01){//mem_alloc
 
-        //printInteger(a0);
-        //printString("\n");
-       //uint64 volatile sstatus = r_sstatus();//psw
-
-        /* //ZA ASINHRONU
-        uint64 volatile sepc = r_sepc() + 4; //
-        uint64 volatile sstatus = r_sstatus();//psw
-        TCB::timeSliceCounter = 0;
-        TCB::dispatch();
-        w_sstatus(sstatus);
-        w_sepc(sepc);
-         */
-        //zasto je ovo iznad uglavnom izostavljeno iz projekata koje ljudi stave na si wiki?
-
-        if(a0 == 0x01){
-            //printInteger(a0);
             void* pointer = MemoryAllocator::getInstance().alloc(a1);
             w_a0_stack((long)pointer);
         }
-        else if(a0 == 0x02){
-            //printInteger(a0);
+        else if(a0 == 0x02){//mem_free
+
             a0 = MemoryAllocator::getInstance().free((void*)a1);
             w_a0_stack(a0);
 
@@ -87,32 +67,38 @@ void Riscv::handleExcEcallTrap() {
             w_a0_stack(ret);
 
         } else if(a0 == 0x12) { //thread_exit
+
             TCB::running->setFinished(true);
+            TCB::timeSliceCounter = 0;
             TCB::dispatch();
 
         } else if(a0 == 0x13){ //thread dispatch()
-        //  timeSliceCounter = 0;
+            
+            TCB::timeSliceCounter = 0;
             TCB::dispatch();
 
         } else if(a0 == 0x14){ //thread_join
             TCB* handle = (TCB*)a1;
-           // if(handle != nullptr){
-            while(!handle->isFinished()) {
+            if(handle != nullptr){
+                 while(!handle->isFinished()) {
+                TCB::timeSliceCounter = 0;
                 TCB::dispatch();
             }
-            //}
+            }
+           
+        
           
         } else if (a0 == 0x21) { //sem_open
             _sem* handle = new _sem((unsigned)a2);
             if(handle == nullptr) {
-                w_a0_stack(0);
+                w_a0_stack(-1);
             } else {
                  _sem** h = (_sem**)a1;
                 if(h == nullptr) {
                     w_a0_stack(-1);
                 } else {
                     *(h) = handle;
-                    w_a0_stack(0); //je l treba nekako da se vrati -1 kao kod greske? kako bi doslo do greske?
+                    w_a0_stack(0); 
 
                 }
                 
@@ -125,6 +111,7 @@ void Riscv::handleExcEcallTrap() {
                 a0 = handle->close();
                 w_a0_stack(a0);
             }
+
         } else if (a0 == 0x23) { //sem_wait
             _sem* handle = (_sem*)a1;
             if(!handle) w_a0_stack(-1);
@@ -132,6 +119,7 @@ void Riscv::handleExcEcallTrap() {
                 a0 = handle->wait();
                 w_a0_stack(a0);
             }
+
         }else if (a0 == 0x24) { //sem_signal
             _sem* handle = (_sem*)a1;
             if(!handle) w_a0_stack(-1);
@@ -139,6 +127,7 @@ void Riscv::handleExcEcallTrap() {
                 a0 = handle->signal();
                 w_a0_stack(a0);
             }
+
         }else if (a0 == 0x31) { //time_sleep
             time_t slice = (time_t)a1;
 
@@ -148,15 +137,15 @@ void Riscv::handleExcEcallTrap() {
             if(slice != 0){
                 TCB::running->setSleeping(true);
                 Riscv::sleepingThreads.put(TCB::running,slice);
+                TCB::timeSliceCounter = 0;
                 TCB::dispatch();
             }
 
         }else if(a0 == 0x41){ //getc
-            /*char c = __getc();
-            w_a0_stack((long)c);*/
 
             char ret = -1;
             while (inputBuffer->empty()) {
+                TCB::timeSliceCounter = 0;
                 TCB::dispatch();
             }
             ret = inputBuffer->getChar();
@@ -164,9 +153,12 @@ void Riscv::handleExcEcallTrap() {
 
 
         } else if(a0 == 0x42){ //putc
-            //__putc((char)a1);
 
             char c = a1;
+            while (outputBuffer->full()) {
+                TCB::timeSliceCounter = 0;
+                TCB::dispatch();
+            }
             outputBuffer->putChar(c);
 
         }
@@ -175,18 +167,24 @@ void Riscv::handleExcEcallTrap() {
 
     } else { //unexpected trap cause
         //print scause, sepc and stval
-        printString1("ERR: \nscause: ");
+        printString1("ERROR: scause: ");
         printInteger1(scauseVar);
         printString1("\nsepc: ");
         printInteger1(sepc);
         printString1("\nsstatus: ");
         printInteger1(sstatus);
         printString1("\n");
-        while (true);
+        while (true) flushOutputBuffer();
     }
-
-
 }
+
+void Riscv::flushOutputBuffer() {
+    while(!Riscv::outputBuffer->empty() && *((char*)(CONSOLE_STATUS)) & CONSOLE_TX_STATUS_BIT){
+        char c = Riscv::outputBuffer->getChar();
+        *(char*)CONSOLE_TX_DATA = c;
+    }
+}
+
 void Riscv::handleExternalTrap() {
 
     volatile int interruptNum = plic_claim();
@@ -202,8 +200,7 @@ void Riscv::handleExternalTrap() {
 void Riscv::handleTimerTrap() {
     time_t volatile temp = Riscv::sleepingThreads.peekFirstSlice();
     time_t volatile t1 = 0;
-    //printInteger1((int)temp);
-    //printString1("\n");
+    
     if(temp != t1){
         Riscv::sleepingThreads.decFirst();
         if(Riscv::sleepingThreads.peekFirstSlice() == 0){
@@ -211,7 +208,7 @@ void Riscv::handleTimerTrap() {
         }
     }
     mc_sip(SIP_SSIP);
-    //ZA ASINHRONU
+    
     TCB::timeSliceCounter++;
     if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
         uint64 volatile sepc = r_sepc();

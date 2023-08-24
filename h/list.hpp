@@ -28,8 +28,6 @@ class List{
     };
     Elem* head, *tail;
 
-    //void* operator new (size_t size){return alloc(size);}
-    //void operator delete(void* ptr){free(ptr);}
 public:
     List():head(0), tail(0){}
 

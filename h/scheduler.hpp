@@ -11,7 +11,6 @@ struct Node{
     Node *next;
     Node(TCB* data, Node* next) : data(data), next(next){}
 
-
     void* operator new (size_t);
     void operator delete (void* ptr) noexcept;
 };
@@ -25,7 +24,6 @@ public:
 
     static TCB* get();
     static void put(TCB* ccb);
-
 
 };
 #endif //OS_PROJECT_SCHEDULER_HPP

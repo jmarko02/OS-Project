@@ -20,15 +20,9 @@ void operator delete[](void* ptr) {
     mem_free(ptr);
 }
 
-Thread::Thread(void (*body)(void *), void *arg):myHandle(nullptr), body(body),arg(arg) {
-    //myHandle == nullptr;
-    //thread_create(&myHandle,body, arg);
-}
+Thread::Thread(void (*body)(void *), void *arg):myHandle(nullptr), body(body),arg(arg) {}
 
-Thread::Thread() : myHandle(nullptr), body(threadWrapper), arg(this){
-    //myHandle = nullptr;
-    //thread_create(&myHandle, Thread::threadWrapper, (void*)this);
-}
+Thread::Thread() : myHandle(nullptr), body(threadWrapper), arg(this){}
 
 int Thread::start() {
     return thread_create(&myHandle,body,arg);
@@ -87,9 +81,7 @@ void PeriodicThread::run() {
 }
 
 PeriodicThread::~PeriodicThread() {
-    terminate(); //da li treba ovo? ili destruktor ne treba da radi nista posto je terminate public metoda pa ce je pozivati korisnik?
-    //napravi klasu izvedenu iz periodicThread , redefinisi periodic activation , napravi dva objekta i vidi sta se desava
-
+    terminate(); 
 }
 
 char Console::getc() {

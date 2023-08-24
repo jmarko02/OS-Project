@@ -11,18 +11,9 @@
 #include "../h/_sem.hpp"
 #include "../h/sleepingThreadsList.hpp"
 #include "../h/BoundedBuffer.hpp"
-//extern "C" void supervisorTrap();
-
-//extern "C" void handleExcEcallTrap();
-//extern "C" void handleHardwareTrap();
-//extern "C" void handleTimerTrap();
 
 class Riscv{
 public :
-
-    static void pushRegisters();
-
-    static void popRegisters();
 
     //pop sstatus.spp and sstatus.spie bits
     static void popSppSpie();
@@ -80,11 +71,9 @@ public :
     static BoundedBuffer* inputBuffer;
     static BoundedBuffer* outputBuffer;
 
-
     static void supervisorTrap();
 
-    static List<_sem> *closedSemaphores;
-
+    static void flushOutputBuffer();
 private:
 
     static SleepingThreadList sleepingThreads;

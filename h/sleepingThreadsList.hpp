@@ -25,7 +25,6 @@ private:
         TCB* data;
         Elem* next;
         time_t relativeTime;
-
     };
     Elem *head, *tail;
 };

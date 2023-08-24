@@ -9,6 +9,7 @@ void PutArguments(short code, ...){
 }
 
 void *mem_alloc(size_t size) {
+
     uint64 sizeInBlocks = (size+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE + 1;
     PutArguments(0x01,sizeInBlocks);
 
@@ -18,6 +19,7 @@ void *mem_alloc(size_t size) {
 }
 
 int mem_free(void* ptr){
+
     PutArguments(0x02,(uint64)ptr);
     volatile uint64 a0;
     __asm__ volatile("mv %0, a0" : "=r"(a0));
@@ -25,15 +27,15 @@ int mem_free(void* ptr){
 }
 
 int thread_create(thread_t* handle, void(*start_routine)(void*), void* arg){
+
     char* stack = (char*)mem_alloc(DEFAULT_STACK_SIZE);
-    //char* stack = (char*)MemoryAllocator::getInstance().alloc((DEFAULT_STACK_SIZE+ MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE+1);
     PutArguments(0x11, handle, start_routine,arg, stack);
     volatile uint64 a0;
     __asm__ volatile("mv %0, a0" : "=r"(a0));
     return a0;
 }
 
-int thread_exit(){
+int thread_exit(){ 
     PutArguments(0x12);
     return 0;
 }
@@ -49,6 +51,7 @@ void thread_join(thread_t handle){
 }
 
 int sem_open(sem_t* handle, unsigned init) {
+
     PutArguments(0x21, handle, init);
     volatile uint64 a0;
     __asm__ volatile("mv %0, a0" : "=r"(a0));
@@ -56,12 +59,14 @@ int sem_open(sem_t* handle, unsigned init) {
 }
 
 int sem_close(sem_t handle) {
+
     PutArguments(0x22, handle);
     volatile uint64 a0;
     __asm__ volatile("mv %0, a0" : "=r"(a0));
     return a0;
 }
 int sem_wait(sem_t handle) {
+
     PutArguments(0x23, handle);
     volatile uint64 a0;
     __asm__ volatile("mv %0, a0" : "=r"(a0));
@@ -69,6 +74,7 @@ int sem_wait(sem_t handle) {
 }
 
 int sem_signal(sem_t handle) {
+
     PutArguments(0x24, handle);
     volatile uint64 a0;
     __asm__ volatile("mv %0, a0" : "=r"(a0));
@@ -76,6 +82,7 @@ int sem_signal(sem_t handle) {
 }
 
 int time_sleep(time_t time) {
+
     PutArguments(0x31, time);
     volatile uint64 a0;
     __asm__ volatile("mv %0, a0" : "=r"(a0));
@@ -83,6 +90,7 @@ int time_sleep(time_t time) {
 }
 
 char getc() {
+
     PutArguments(0x41);
     volatile char a0;
     __asm__ volatile("mv %0, a0" : "=r"(a0));

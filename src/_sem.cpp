@@ -49,15 +49,7 @@ int _sem::close() {
 
     if(closed) return -1;
     closed = true;
-    /*if(blockedThreads.peekFirst() != nullptr) {
-        while(blockedThreads.peekFirst()){
-            blockedThreads.peekFirst()->setBlocked(false);
-            Scheduler::put(blockedThreads.peekFirst());
-            blockedThreads.removeFirst();
-        }
-    }
-    Riscv::closedSemaphores->addLast(this);
-     */
+  
     if(head != nullptr){
         while(head){
             TCB* first = getFirst();
@@ -73,9 +65,7 @@ void _sem::block() {
     numOfBlockedThreads++;
     TCB::running->setBlocked(true);
     putLast(TCB::running);
-    //blockedThreads.addLast(TCB::running);
-    //Scheduler::put(TCB::running);
-    //thread_dispatch(); //sis poziv u okviru sis poziva???
+    TCB::timeSliceCounter = 0;
     TCB::dispatch();
 
 }
@@ -83,7 +73,6 @@ void _sem::block() {
 void _sem::deblock() {
     numOfBlockedThreads--;
     TCB* tmp = getFirst();
-    //TCB* tmp = blockedThreads.removeFirst();
     tmp->setBlocked(false);
     Scheduler::put(tmp);
 }
@@ -97,7 +86,6 @@ TCB *_sem::getFirst() {
 
     delete old;
     return ret;
-
 }
 
 void _sem::putLast(TCB *thread) {
