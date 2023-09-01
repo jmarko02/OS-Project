@@ -5,6 +5,7 @@
 #ifndef OS_PROJECT_SYSCALL_C_H
 #define OS_PROJECT_SYSCALL_C_H
 #include "../lib/hw.h"
+#include "../h/tcb.hpp"
 
 
 void* mem_alloc(size_t size);

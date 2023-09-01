@@ -19,6 +19,8 @@ public:
 
     static void threadWrapper(void* );
 
+    int getId() const { return myHandle->getThreadId();}
+
 protected:
     Thread ();
     virtual void run () {}

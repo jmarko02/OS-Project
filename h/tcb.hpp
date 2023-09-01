@@ -8,6 +8,8 @@
 #include "../lib/hw.h"
 #include "../h/scheduler.hpp"
 
+class Resourse;
+
 class TCB{
 public:
 
@@ -36,6 +38,9 @@ public:
     void* operator new (size_t);
     void operator delete (void* ptr) noexcept;
     
+    int getThreadId() const { return id;}
+
+    //friend class Resource;
 
     TCB(char* stack, Body body, void* arg ):
             userMode(stack != nullptr),
@@ -49,7 +54,10 @@ public:
             timeSlice(DEFAULT_TIME_SLICE),
             finished(false),
             blocked(false),
-            sleeping(false)
+            sleeping(false),
+            resources(0), //!!!!!!!
+            waiting(false),
+            ticks(0)
     {
         if(body != nullptr) Scheduler::put(this);
 
@@ -68,9 +76,17 @@ private:
     bool finished;
     bool blocked;
     bool sleeping;
+    int resources;
+    bool waiting;
+    int ticks;
+
+    
+    static int brojac;
+    int id = brojac++;
 
     friend class _sem;
     friend class Riscv;
+    friend class Resourse;
 
     static void threadWrapper(); //staticka metoda koja se prva izvrsava za svaku NOVONAPRAVLJENU nit
 
@@ -79,6 +95,12 @@ private:
     static void dispatch();
 
     static time_t timeSliceCounter; 
+
+    //MODIF
+    //int resources;
+
+    //static int brojac;
+    //int id = brojac++;
 
 };
 

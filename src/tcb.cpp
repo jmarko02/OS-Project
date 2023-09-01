@@ -6,6 +6,8 @@
 #include "../h/MemoryAllocator.hpp"
 #include "../h/syscall_c.h"
 
+int TCB::brojac = 0;
+
 TCB* TCB::running = nullptr;
 
 time_t TCB::timeSliceCounter = 0;
@@ -16,7 +18,7 @@ TCB *TCB::threadCreate(char *stack, TCB::Body body, void *arg) {
 
 void TCB::dispatch() { 
     TCB* old = running;
-    if(!old->isFinished() && !old->isBlocked() && !old->isSleeping()) {Scheduler::put(old);}
+    if(!old->isFinished() && !old->isBlocked() && !old->isSleeping() && !old->waiting) {Scheduler::put(old);}
     running = Scheduler::get();
     //if(old->isFinished()) delete old;
     TCB::contextSwitch(&old->context, &running->context);
