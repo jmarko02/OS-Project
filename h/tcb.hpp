@@ -32,7 +32,6 @@ public:
     static TCB* running;
 
     bool userMode;
-
     void* operator new (size_t);
     void operator delete (void* ptr) noexcept;
     

@@ -81,9 +81,9 @@ void Riscv::handleExcEcallTrap() {
             TCB* handle = (TCB*)a1;
             if(handle != nullptr){
                  while(!handle->isFinished()) {
-                TCB::timeSliceCounter = 0;
-                TCB::dispatch();
-            }
+                    TCB::timeSliceCounter = 0;
+                    TCB::dispatch();
+                }
             }
            
         
