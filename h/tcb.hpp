@@ -27,6 +27,8 @@ public:
     bool isBlocked() const { return blocked;}
     void setBlocked(bool blocked){TCB::blocked = blocked;}
 
+    int getId(){return this->id;}
+
     uint64 getTimeSlice() const { return timeSlice;} 
 
     static TCB* running;
@@ -68,6 +70,9 @@ private:
     bool finished;
     bool blocked;
     bool sleeping;
+
+    int id = brojac++;
+    static int brojac;
 
     friend class _sem;
     friend class Riscv;

@@ -50,6 +50,13 @@ void thread_join(thread_t handle){
     return;
 }
 
+int thread_id(){
+    PutArguments(0x15);
+    volatile uint64 a0;
+    __asm__ volatile("mv %0, a0" : "=r"(a0));
+    return a0;
+}
+
 int sem_open(sem_t* handle, unsigned init) {
 
     PutArguments(0x21, handle, init);

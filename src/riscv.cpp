@@ -81,14 +81,17 @@ void Riscv::handleExcEcallTrap() {
             TCB* handle = (TCB*)a1;
             if(handle != nullptr){
                  while(!handle->isFinished()) {
-                TCB::timeSliceCounter = 0;
-                TCB::dispatch();
+                    TCB::timeSliceCounter = 0;
+                    TCB::dispatch();
+                }
             }
-            }
-           
-        
           
-        } else if (a0 == 0x21) { //sem_open
+        } else if(a0 == 0x15) {//thread_id
+            int id = TCB::running->getId();
+            w_a0_stack(id);
+            TCB::dispatch();
+
+        }else if (a0 == 0x21) { //sem_open
             _sem* handle = new _sem((unsigned)a2);
             if(handle == nullptr) {
                 w_a0_stack(-1);

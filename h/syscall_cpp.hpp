@@ -19,6 +19,8 @@ public:
 
     static void threadWrapper(void* );
 
+    int getThreadId();
+
 protected:
     Thread ();
     virtual void run () {}
@@ -39,6 +41,18 @@ private:
 class PeriodicThread : public Thread {
 public:
     void terminate ();
+
+    void stopThread();
+
+    
+    struct Elem {
+        PeriodicThread* thread;
+        Elem* next;
+        Elem(PeriodicThread* t):thread(t), next(nullptr){}
+    };
+    static void addLast(PeriodicThread* t);
+    static PeriodicThread* getFirst();
+    
 protected:
     PeriodicThread (time_t period);
     virtual void periodicActivation () {}
@@ -46,6 +60,9 @@ protected:
     virtual ~PeriodicThread() override;
 private:
     time_t period;
+    
+    static Elem* head;
+    static Elem* tail;
 };
 class Console {
 public:

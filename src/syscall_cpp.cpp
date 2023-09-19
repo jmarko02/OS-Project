@@ -49,6 +49,10 @@ int Thread::sleep(time_t time) {
     return time_sleep(time);
 }
 
+int Thread::getThreadId(){
+    return thread_id();
+}
+
 Semaphore::Semaphore(unsigned int init) {
     sem_open(&myHandle, init);
 }
@@ -65,12 +69,43 @@ int Semaphore::signal() {
     return sem_signal(myHandle);
 }
 
+PeriodicThread::Elem* PeriodicThread::head = nullptr;
+PeriodicThread::Elem* PeriodicThread::tail = nullptr;
+
 void PeriodicThread::terminate() {
     period = 0;
 }
 
+void PeriodicThread::stopThread()
+{
+    terminate();
+}
 PeriodicThread::PeriodicThread(time_t period) {
     this->period = period;
+    addLast(this);
+}
+
+void PeriodicThread::addLast(PeriodicThread * t)
+{
+    Elem* node = new Elem(t);
+    if(tail != nullptr){
+        tail->next = node;
+        tail = node;
+    } else {
+        tail = head = node;
+    }
+}
+PeriodicThread * PeriodicThread::getFirst()
+{
+    if(!head) return 0;
+
+    Elem* node = head;
+    head = head->next;
+    if(!head) tail = 0;
+
+    PeriodicThread* ret = node->thread;
+    delete node;
+    return ret;
 }
 
 void PeriodicThread::run() {

@@ -8,6 +8,8 @@
 
 TCB* TCB::running = nullptr;
 
+int TCB::brojac = 0;
+
 time_t TCB::timeSliceCounter = 0;
 
 TCB *TCB::threadCreate(char *stack, TCB::Body body, void *arg) {
