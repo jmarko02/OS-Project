@@ -19,6 +19,8 @@ public:
 
     static void threadWrapper(void* );
 
+    void join(time_t);
+
 protected:
     Thread ();
     virtual void run () {}

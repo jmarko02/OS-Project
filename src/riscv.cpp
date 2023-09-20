@@ -12,6 +12,7 @@
 SleepingThreadList Riscv::sleepingThreads;
 BoundedBuffer* Riscv::inputBuffer = nullptr;
 BoundedBuffer* Riscv::outputBuffer = nullptr;
+size_t Riscv::timerCounter = 0;
 
 void Riscv::popSppSpie() { //mora biti non inline, mora zaista da se pozove ova fja
 
@@ -88,7 +89,27 @@ void Riscv::handleExcEcallTrap() {
            
         
           
-        } else if (a0 == 0x21) { //sem_open
+        } else if (a0 == 0x15) {
+            TCB* handle = (TCB*)a1;
+            time_t time = (time_t)a2;
+            if(handle != nullptr && time >= 0){
+                if(time == 0) {
+                    while(!handle->isFinished()) {
+                        TCB::timeSliceCounter = 0;
+                        TCB::dispatch();
+                    }
+                } else {
+                    TCB::running->timerCounterThread = timerCounter;
+                    while(!handle->isFinished()){
+                        if(timerCounter-TCB::running->timerCounterThread < time){
+                            TCB::dispatch();
+                        }else break;
+                    }
+                }
+            }
+
+
+        }else if (a0 == 0x21) { //sem_open
             _sem* handle = new _sem((unsigned)a2);
             if(handle == nullptr) {
                 w_a0_stack(-1);
@@ -198,6 +219,7 @@ void Riscv::handleExternalTrap() {
 }
 
 void Riscv::handleTimerTrap() {
+    timerCounter++;
     time_t volatile temp = Riscv::sleepingThreads.peekFirstSlice();
     time_t volatile t1 = 0;
     

@@ -73,6 +73,8 @@ public :
     static void supervisorTrap();
 
     static void flushOutputBuffer();
+
+    static time_t timerCounter;
 private:
 
     static SleepingThreadList sleepingThreads;

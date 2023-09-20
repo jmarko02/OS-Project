@@ -49,7 +49,8 @@ public:
             timeSlice(DEFAULT_TIME_SLICE),
             finished(false),
             blocked(false),
-            sleeping(false)
+            sleeping(false),
+            timerCounterThread(0)
     {
         if(body != nullptr) Scheduler::put(this);
 
@@ -68,6 +69,8 @@ private:
     bool finished;
     bool blocked;
     bool sleeping;
+
+    size_t timerCounterThread;
 
     friend class _sem;
     friend class Riscv;
