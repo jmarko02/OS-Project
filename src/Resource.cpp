@@ -11,7 +11,7 @@ void Resourse::take(int num_of_instances, int time_ticks)
 {
     if(time_ticks % 5 != 0) return;
     TCB::running->ticks = time_ticks;
-    //mutex->wait();
+    mutex->wait();
     
     TCB::running->resources = num_of_instances;
     if (n >= num_of_instances){
@@ -29,7 +29,7 @@ void Resourse::take(int num_of_instances, int time_ticks)
             lastActive = newElem;
         }
         
-        //mutex->signal();
+        mutex->signal();
         
 
     } else { //block
@@ -40,7 +40,7 @@ void Resourse::take(int num_of_instances, int time_ticks)
             tailBlocked->next = newElem;
             tailBlocked = newElem;
         }
-       //mutex->signal();
+       mutex->signal();
         TCB::timeSliceCounter = 0;
         TCB::dispatch();
 
@@ -55,7 +55,7 @@ int Resourse::give_back(int num_of_instances)
     if(num_of_instances > TCB::running->resources){
         num_of_instances = TCB::running->resources;
     }
-    //mutex->wait();
+    mutex->wait();
 
     TCB::running->resources -= num_of_instances;
     n += num_of_instances;
@@ -136,13 +136,13 @@ int Resourse::give_back(int num_of_instances)
          
     }
 
-    //mutex->signal();
+    mutex->signal();
 
     return num_of_instances;
 }
 void Resourse::periodicActivation()
 {
-    //mutex->wait();
+    mutex->wait();
 
     Elem* pom = firstActive, *prev = nullptr;
     while(pom){
@@ -231,6 +231,6 @@ void Resourse::periodicActivation()
         } 
     }
 
-    //mutex->signal();
+    mutex->signal();
 
 }
