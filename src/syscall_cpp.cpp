@@ -57,11 +57,13 @@ uint64 Thread::intervalTime = 0;
 
 Semaphore* Thread::mutex = nullptr;
 
+uint64 Thread::cnt = 0;
+
 void Thread::SetMaximumThreads(int num_of_threads, uint64 max_time, uint64 interval_time){
     maxUserThreads = num_of_threads;
     maxTime = max_time;
     intervalTime = interval_time;
-    mutex = new Semaphore(maxUserThreads);
+    mutex = new Semaphore(maxUserThreads+1);
 }
 
 Semaphore::Semaphore(unsigned int init) {
@@ -98,6 +100,7 @@ void PeriodicThread::run() {
 PeriodicThread::~PeriodicThread() {
     terminate(); 
 }
+
 
 char Console::getc() {
     return ::getc();

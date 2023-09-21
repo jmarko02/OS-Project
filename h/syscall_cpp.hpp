@@ -32,6 +32,8 @@ protected:
     static uint64 maxTime;
     static uint64 intervalTime;
     static Semaphore* mutex;
+    
+    static uint64 cnt;
 
 private:
     thread_t myHandle;
@@ -41,6 +43,7 @@ private:
 
     static uint64 counter;
     uint64 id = ++counter;
+
 };
 
 class Semaphore {
@@ -60,6 +63,7 @@ protected:
     virtual void periodicActivation () {}
     virtual void run() override;
     virtual ~PeriodicThread() override;
+
 private:
     time_t period;
 };
