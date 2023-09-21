@@ -19,6 +19,8 @@ public:
 
     static void threadWrapper(void* );
 
+    void ping();
+
 protected:
     Thread ();
     virtual void run () {}

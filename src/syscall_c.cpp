@@ -50,6 +50,11 @@ void thread_join(thread_t handle){
     return;
 }
 
+void thread_ping(thread_t handle){
+    PutArguments(0x15, handle);
+    return;
+}
+
 int sem_open(sem_t* handle, unsigned init) {
 
     PutArguments(0x21, handle, init);

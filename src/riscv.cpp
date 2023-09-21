@@ -86,8 +86,9 @@ void Riscv::handleExcEcallTrap() {
             }
             }
            
-        
-          
+        }else if (a0 == 0x15){
+            ((TCB*)a1)->setPinged(true);
+
         } else if (a0 == 0x21) { //sem_open
             _sem* handle = new _sem((unsigned)a2);
             if(handle == nullptr) {

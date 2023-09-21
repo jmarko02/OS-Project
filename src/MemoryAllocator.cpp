@@ -3,6 +3,7 @@
 //
 
 #include "../h/MemoryAllocator.hpp"
+#include "../h/tcb.hpp"
 
 MemoryAllocator::MemoryAllocator() {
     uint64 heapSize = (uint64)HEAP_END_ADDR - (uint64)HEAP_START_ADDR; //in bytes
@@ -22,6 +23,8 @@ MemoryAllocator& MemoryAllocator::getInstance() {
 void *MemoryAllocator::alloc(size_t blockCount) {
 
     if(blockCount <= 0 ) return nullptr;
+
+    if(TCB::running) TCB::running->memory += blockCount;
 
     for(FreeNode* cur = freeHead; cur != nullptr; cur = cur->next){
         if(cur->size >= blockCount) { //first fit
@@ -63,6 +66,8 @@ int MemoryAllocator::free(void* pointer) {
     if (pointer == nullptr || (uint64 *)pointer<(uint64*)HEAP_START_ADDR || (uint64 *)pointer>=(uint64*)HEAP_END_ADDR) return -1;
 
     size_t blockCount = *( (size_t*) ( (char*)pointer -1*MEM_BLOCK_SIZE) );
+    
+    if(TCB::running) TCB::running->memory -= blockCount;
 
     auto addr = (char*)pointer - MEM_BLOCK_SIZE;
     if((char*)addr + blockCount*MEM_BLOCK_SIZE >= HEAP_END_ADDR) return -2;

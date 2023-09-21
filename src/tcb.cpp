@@ -5,6 +5,7 @@
 #include "../h/riscv.hpp"
 #include "../h/MemoryAllocator.hpp"
 #include "../h/syscall_c.h"
+#include "../h/print.hpp"
 
 TCB* TCB::running = nullptr;
 
@@ -15,6 +16,12 @@ TCB *TCB::threadCreate(char *stack, TCB::Body body, void *arg) {
 }
 
 void TCB::dispatch() { 
+    if(TCB::running->pinged){
+        running->setPinged(false);
+        printString1("memory: ");
+        printInteger1(TCB::running->memory);
+        printString1("\n");
+    }
     TCB* old = running;
     if(!old->isFinished() && !old->isBlocked() && !old->isSleeping()) {Scheduler::put(old);}
     running = Scheduler::get();

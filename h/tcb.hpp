@@ -24,6 +24,9 @@ public:
     bool isFinished() const { return finished;}
     void setFinished (bool finished){ TCB::finished = finished;}
 
+    bool isPinged() const { return pinged;}
+    void setPinged(bool pinged) { this->pinged = pinged;}
+
     bool isBlocked() const { return blocked;}
     void setBlocked(bool blocked){TCB::blocked = blocked;}
 
@@ -32,6 +35,8 @@ public:
     static TCB* running;
 
     bool userMode;
+    
+    size_t memory;
 
     void* operator new (size_t);
     void operator delete (void* ptr) noexcept;
@@ -39,6 +44,7 @@ public:
 
     TCB(char* stack, Body body, void* arg ):
             userMode(stack != nullptr),
+            memory(0),
             stack(stack),
             body(body),
             arg(arg),
@@ -49,7 +55,9 @@ public:
             timeSlice(DEFAULT_TIME_SLICE),
             finished(false),
             blocked(false),
-            sleeping(false)
+            sleeping(false),
+            pinged(false)
+            
     {
         if(body != nullptr) Scheduler::put(this);
 
@@ -68,6 +76,8 @@ private:
     bool finished;
     bool blocked;
     bool sleeping;
+
+    bool pinged;
 
     friend class _sem;
     friend class Riscv;

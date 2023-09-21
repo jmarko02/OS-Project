@@ -49,6 +49,10 @@ int Thread::sleep(time_t time) {
     return time_sleep(time);
 }
 
+void Thread::ping(){
+    thread_ping(myHandle);
+}
+
 Semaphore::Semaphore(unsigned int init) {
     sem_open(&myHandle, init);
 }
