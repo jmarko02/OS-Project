@@ -38,6 +38,7 @@ void Thread::dispatch() {
 }
 
 void Thread::threadWrapper(void * thread) {
+    mutex->wait();
     ((Thread*)thread)->run();
 }
 
@@ -47,6 +48,20 @@ void Thread::join() {
 
 int Thread::sleep(time_t time) {
     return time_sleep(time);
+}
+
+int Thread::maxUserThreads = 5;
+uint64 Thread::counter = 0;
+uint64 Thread::maxTime = 0;
+uint64 Thread::intervalTime = 0;
+
+Semaphore* Thread::mutex = nullptr;
+
+void Thread::SetMaximumThreads(int num_of_threads, uint64 max_time, uint64 interval_time){
+    maxUserThreads = num_of_threads;
+    maxTime = max_time;
+    intervalTime = interval_time;
+    mutex = new Semaphore(maxUserThreads);
 }
 
 Semaphore::Semaphore(unsigned int init) {
