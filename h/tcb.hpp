@@ -70,7 +70,7 @@ private:
     bool blocked;
     bool sleeping;
 
-    size_t timerCounterThread;
+    time_t timerCounterThread;
 
     friend class _sem;
     friend class Riscv;

@@ -12,7 +12,7 @@
 SleepingThreadList Riscv::sleepingThreads;
 BoundedBuffer* Riscv::inputBuffer = nullptr;
 BoundedBuffer* Riscv::outputBuffer = nullptr;
-size_t Riscv::timerCounter = 0;
+time_t Riscv::timerCounter = 0;
 
 void Riscv::popSppSpie() { //mora biti non inline, mora zaista da se pozove ova fja
 
